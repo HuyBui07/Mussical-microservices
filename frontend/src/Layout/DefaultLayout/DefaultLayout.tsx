@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import { ReactNode } from 'react';
+import SideBar from '../../Components/SideBar';
 
 function DefaultLayout({ children }: { children: ReactNode }) {
     return (  
-        <div>
-            <div>{children}</div> 
+        <div className="flex flex-col h-screen">
+            <div className="flex flex-grow">
+                <SideBar />
+                <div className="flex-grow ">{children}</div>
+            </div>
         </div>
     );
 }

@@ -1,18 +1,7 @@
 export default function Register() {
     return (
       <>
-        <div className="flex min-h-full">
-            {/* Phần bên phải */}
-          <div className="hidden lg:block w-1/2 flex justify-center items-center">
-          <img
-                src="https://res.cloudinary.com/droondbdu/image/upload/v1711187980/Downloader.la_-65fea7d414e10_f9vbni.jpg"
-                alt="Right Image"
-                className=""
-              />
-          </div>
-
-          {/* Phần bên trái chiếm 1/2 màn hình */}
-          <div className=" w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="  flex flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
               <img
                 className="mx-auto h-16 w-auto"
@@ -81,7 +70,7 @@ export default function Register() {
                 <div>
                   <button
                     type="submit"
-                    className=" bg-black flex w-full justify-center rounded-md bg-indigo-600 px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className=" bg-black flex w-full justify-center rounded-md px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                    Sign up
                   </button>
@@ -96,7 +85,6 @@ export default function Register() {
               </p>
             </div>
           </div>
-        </div>
       </>
     );
   }
