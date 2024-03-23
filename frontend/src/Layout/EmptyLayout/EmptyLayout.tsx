@@ -1,18 +1,16 @@
 import PropTypes from 'prop-types';
 import { ReactNode } from 'react';
-import SideBar from '../../Components/SideBar';
 
-function DefaultLayout({ children }: { children: ReactNode }) {
+function EmptyLayout({ children }: { children: ReactNode }) {
     return (  
         <div>
-            <SideBar></SideBar>
             <div>{children}</div> 
         </div>
     );
 }
 
-DefaultLayout.propTypes = {
+EmptyLayout.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
-export default DefaultLayout;
+export default EmptyLayout;
