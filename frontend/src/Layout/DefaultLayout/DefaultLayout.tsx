@@ -4,9 +4,11 @@ import SideBar from '../../Components/SideBar';
 
 function DefaultLayout({ children }: { children: ReactNode }) {
     return (  
-        <div>
-            <SideBar></SideBar>
-            <div>{children}</div> 
+        <div className="flex flex-col h-screen">
+            <div className="flex flex-grow">
+                <SideBar />
+                <div className="flex-grow ">{children}</div>
+            </div>
         </div>
     );
 }
