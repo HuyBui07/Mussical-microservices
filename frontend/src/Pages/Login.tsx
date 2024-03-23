@@ -6,11 +6,11 @@ export default function Login() {
         <div className=" w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
-              className="mx-auto h-10 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              className="mx-auto h-16 w-auto"
+              src="https://res.cloudinary.com/droondbdu/image/upload/v1711188975/v940-bb-ju-26-removebg-preview_aqhiyo.png"
               alt="Your Company"
             />
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            <h2 className="mt-4 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Sign in to your account
             </h2>
           </div>
@@ -28,7 +28,7 @@ export default function Login() {
                     type="email"
                     autoComplete="email"
                     required
-                    className="bg-white block w-full rounded-md border-0 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
+                    className="bg-white block w-full rounded-md border-0 px-3 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
@@ -39,7 +39,7 @@ export default function Login() {
                     Password
                   </label>
                   <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    <a href="#" className="text-black font-semibold  hover:text-gray-500">
                       Forgot password?
                     </a>
                   </div>
@@ -51,7 +51,7 @@ export default function Login() {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="bg-white block w-full rounded-md border-0 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
+                    className="bg-white block w-full rounded-md border-0 px-3 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
@@ -67,9 +67,9 @@ export default function Login() {
             </form>
 
             <p className="mt-10 text-center text-sm text-gray-500">
-              Not a member?{' '}
-              <a href="#" className="font-semibold leading-6 text-black hover:text-indigo-500">
-                Start a 14 day free trial
+              Don't have an account{' '}
+              <a href="/register" className="font-semibold leading-6 text-black hover:text-gray-500">
+                Sign up
               </a>
             </p>
           </div>
