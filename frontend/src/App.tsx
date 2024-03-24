@@ -1,10 +1,22 @@
-import Login from "./Login";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { publicRoutes} from '../src/Routes/Routes'
 
 function App() {
   return (
-    <div className="flex justify-center items-center h-screen w-screen">
-      <Login />
-    </div>
+    <>
+    <Router>
+            <div>
+                <Routes>
+                    {publicRoutes.map((route, index) => {
+                          const Page = route.component;
+                          let Layout = route.layout;
+                          return (<Route key={index} path={route.path} element = {<Layout><Page/></Layout>}/>)
+                      }
+                    )}
+                </Routes>
+            </div>
+        </Router>
+    </>
   );
 }
 
