@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 
 //routers
 import userRouter from "./routes/userRouter";
+import songRouter from "./routes/songRouter";
 
 const app = express();
 const port = 4000;
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/songs", songRouter);
 
 mongoose
   .connect(process.env.MONGO_URL as string)
