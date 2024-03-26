@@ -1,8 +1,40 @@
 import { google } from "googleapis";
 import fs from "fs";
+import { Request, Response } from "express";
 
-const getSong = async (req: any, res: any) => {
-  const fileId = "1wGFmr8t0aPnbUD_EJw1O3DrLLo9RmtP9";
+//model
+import Song from "../models/songModel";
+
+// const propSong: Song = {
+//   id: 1,
+//   title: "Under The Sun",
+//   artist: "Keys of Moon",
+//   file_id: "1wGFmr8t0aPnbUD_EJw1O3DrLLo9RmtP9",
+// };
+
+const getAllSongs = async (req: Request, res: Response) => {
+  try {
+    const songs = await Song.find();
+    res.status(200).json(songs);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+const getMetadataFromSongId = async (req: Request, res: Response) => {
+  const { song_id } = req.params;
+
+  try {
+    const song = await Song.findById(song_id);
+    res.status(200).json(song);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
+const getSongFile = async (req: any, res: any) => {
+  const fileId = req.params.file_id;
   // Load client secrets from a local file.
   fs.readFile("./apikeys.json", (err, content: any) => {
     if (err) return console.log("Error loading client secret file:", err);
@@ -53,7 +85,7 @@ const getSong = async (req: any, res: any) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials: any, callback: any) {
-    const { client_email, private_key } = credentials;
+  const { client_email, private_key } = credentials;
   const oAuth2Client = new google.auth.JWT(
     client_email,
     undefined, // Replace null with undefined
@@ -65,4 +97,4 @@ function authorize(credentials: any, callback: any) {
   callback(oAuth2Client);
 }
 
-export { getSong };
+export { getAllSongs, getMetadataFromSongId, getSongFile };
