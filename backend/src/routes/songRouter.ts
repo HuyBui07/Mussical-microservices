@@ -1,8 +1,10 @@
 import express from 'express';
-import { getSong } from '../controllers/songController';
+import { getAllSongs, getMetadataFromSongId, getSongFile } from '../controllers/songController';
 
 const router = express.Router();
 
-router.get('/', getSong);
+router.get('/all', getAllSongs);
+router.get('/:song_id', getMetadataFromSongId);
+router.get('/:file_id', getSongFile);
 
 export default router;

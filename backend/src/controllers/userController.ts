@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/userModel";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../middlewares/requireAuth";
 
 const createToken = (_id: string) => {
   return jwt.sign({ _id }, process.env.SECRET_KEY as string, {

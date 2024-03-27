@@ -4,7 +4,7 @@ import validator from "validator";
 
 interface IUser extends Document {
   email: string;
-  passwordHash: string
+  passwordHash: string;
 }
 
 interface IUserModel extends Model<IUser> {
@@ -14,7 +14,7 @@ interface IUserModel extends Model<IUser> {
 
 const userSchema = new Schema<IUser>({
   email: { type: String, required: true },
-  passwordHash: { type: String, required: true },
+  passwordHash: { type: String, required: true }
 });
 
 userSchema.statics.logIn = async function (email, password) {
