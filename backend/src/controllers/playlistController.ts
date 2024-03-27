@@ -42,6 +42,7 @@ const addSongToPlaylist = async (
   }
 };
 
+//get all playlists for the user
 const getAllPlaylists = async (
   req: AuthRequest,
   res: Response

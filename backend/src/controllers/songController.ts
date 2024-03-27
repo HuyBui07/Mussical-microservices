@@ -12,6 +12,7 @@ import Song from "../models/songModel";
 //   file_id: "1wGFmr8t0aPnbUD_EJw1O3DrLLo9RmtP9",
 // };
 
+//get all songs for the main screen ()
 const getAllSongs = async (req: Request, res: Response) => {
   try {
     const songs = await Song.find();
@@ -21,6 +22,7 @@ const getAllSongs = async (req: Request, res: Response) => {
   }
 }
 
+//get metadata from a song id
 const getMetadataFromSongId = async (req: Request, res: Response) => {
   const { song_id } = req.params;
 
@@ -32,7 +34,7 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
   }
 }
 
-
+//get the song file from Drive
 const getSongFile = async (req: any, res: any) => {
   const fileId = req.params.file_id;
   // Load client secrets from a local file.

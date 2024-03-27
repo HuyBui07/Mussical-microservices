@@ -3,7 +3,7 @@ import { getAllSongs, getMetadataFromSongId, getSongFile } from '../controllers/
 
 const router = express.Router();
 
-router.get('/', getAllSongs);
+router.get('/all', getAllSongs);
 router.get('/:song_id', getMetadataFromSongId);
 router.get('/:file_id', getSongFile);
 
