@@ -8,8 +8,10 @@ function DefaultLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex flex-grow">
-        <SideBar setTab={setCurrentTab} />
-        <div className="flex-grow ">{currentTab}</div>
+        <div className="w-1/5">
+          <SideBar setTab={setCurrentTab} />
+        </div>
+        <div className="flex-grow w-4/5">{currentTab}</div>
       </div>
     </div>
   );
