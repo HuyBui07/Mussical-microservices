@@ -14,13 +14,17 @@ import Song from "../models/songModel";
 
 //get all songs for the main screen ()
 const getAllSongs = async (req: Request, res: Response) => {
+  const title = req.query.title as string;
+
   try {
-    const songs = await Song.find();
+    const songs = await Song.find({
+      title: { $regex: new RegExp(title), $options: "i" },
+    });
     res.status(200).json(songs);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
 //get metadata from a song id
 const getMetadataFromSongId = async (req: Request, res: Response) => {
@@ -32,7 +36,7 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
 //get the song file from Drive
 const getSongFile = async (req: any, res: any) => {
