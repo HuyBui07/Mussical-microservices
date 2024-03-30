@@ -42,7 +42,7 @@ export default function Explore() {
     <>
       {/* Navigation Bar */}
       <div
-        className="m-2 mb-8 lg:ml-[315px] bg-zinc-800 h-[80%] "
+        className="m-2 mb-8 ml-4 bg-zinc-800 h-[80%] "
         style={{ borderRadius: "10px" }}
       >
         <NavBar />
@@ -113,7 +113,7 @@ export default function Explore() {
 
       {/* Music player */}
       <div
-        className="mx-2 mt-[-25px] lg:ml-[315px] bg-zinc-800 h-[17%] "
+        className="mx-2 mt-[-25px] ml-4 bg-zinc-800 h-[17%] "
         style={{ borderRadius: "10px" }}
       >
         <MusicPlayer />

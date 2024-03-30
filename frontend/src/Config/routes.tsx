@@ -3,6 +3,8 @@ const routes = {
   login: "/login",
   register: "/register",
   home: "/home",
+  explore: "/explore",
+  playlist: "/playlist",
   profile: "/home/profile",
 };
 

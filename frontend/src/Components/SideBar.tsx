@@ -25,7 +25,7 @@ export default function SideBar({
     <>
       <div className="bg-black hidden lg:block">
         <div
-          className="m-2 sidebar fixed top-0 bottom-0 lg:left-0 p-2 w-[300px] overflow-y-auto text-center bg-zinc-800"
+          className="m-2 sidebar fixed top-0 bottom-0 lg:left-0 p-2 w-1/5 overflow-y-auto text-center bg-zinc-800"
           style={{ borderRadius: "10px" }}
         >
           <div className="text-gray-100 text-xl">
