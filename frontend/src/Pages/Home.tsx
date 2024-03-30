@@ -1,10 +1,7 @@
 import MusicPlayer from "../Components/MusicPlayer";
 import NavBar from "../Components/NavBar";
-import {
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  PlayCircleIcon,
-} from "@heroicons/react/16/solid";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/16/solid";
+import Song from "../Components/Song";
 export default function Home() {
   const songs = [
     {
@@ -63,20 +60,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {songs.map((song) => (
-                <a key={song.id} href={song.href} className="group relative">
-                  <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                    <img
-                      src={song.imageSrc}
-                      alt="none"
-                      className="h-full w-full object-cover object-center group-hover:opacity-75"
-                    />
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <PlayCircleIcon className="w-16" />
-                    </div>
-                  </div>
-                  <h3 className="mt-4 ml-12 text-md text-white">{song.name}</h3>
-                </a>
+                <Song data={song} />
               ))}
             </div>
           </div>
@@ -91,20 +75,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {songs.map((song) => (
-                <a key={song.id} href={song.href} className="group relative">
-                  <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                    <img
-                      src={song.imageSrc}
-                      alt="none"
-                      className="h-full w-full object-cover object-center group-hover:opacity-75"
-                    />
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <PlayCircleIcon className="w-16" />
-                    </div>
-                  </div>
-                  <h3 className="mt-4 ml-12 text-md text-white">{song.name}</h3>
-                </a>
+                <Song data={song} />
               ))}
             </div>
           </div>
