@@ -1,58 +1,28 @@
+import { useEffect, useState } from "react";
 import MusicPlayer from "../Components/MusicPlayer";
 import NavBar from "../Components/NavBar";
+import axios from "axios";
+interface SongData {
+  id: number;
+  title: string;
+  poster: string;
+  artist: string;
+  source: string;
+}
 export default function Playlist() {
-  const songs = [
-    {
-      id: 1,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 2,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 3,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 4,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 5,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 6,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-    {
-      id: 7,
-      name: "Chúng ta của tương lai",
-      href: "#",
-      imageSrc:
-        "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fvariety.com%2Fwp-content%2Fuploads%2F2022%2F08%2FScreen-Shot-2022-08-31-at-9.53.54-PM.png%3Fw%3D1024&f=1&nofb=1&ipt=eebdbd7c2cf5fb360a0552788590e9061419d08c2b7167f55ecb6c51df1292d7&ipo=images",
-    },
-  ];
+  const [songs, setSongs] = useState<SongData[]>([]);
+  const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
 
+  useEffect(() => {
+    axios
+      .get<SongData[]>("http://localhost:4000/api/songs/all")
+      .then((res) => setSongs(res.data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  const handleSongClick = (song: SongData) => {
+    setSelectedSong(song);
+  };
   return (
     <>
       {/* Navigation Bar */}
@@ -94,7 +64,7 @@ export default function Playlist() {
               maxHeight: "240px",
             }}
           >
-            {songs.map((song) => (
+            {/* {songs.map((song) => (
               <div
                 key={song.id}
                 className="flex flex-row justify-between items-center"
@@ -117,7 +87,7 @@ export default function Playlist() {
                 <div className="text-white text-sm ml-4">{song.name}</div>
                 <div className="text-white text-sm ml-4">3:00</div>
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
@@ -127,7 +97,8 @@ export default function Playlist() {
         className="mx-2 mt-[-25px] ml-4 bg-zinc-800 h-[17%] "
         style={{ borderRadius: "10px", position: "relative" }}
       >
-        <MusicPlayer />
+        {" "}
+        <MusicPlayer selectedSong={selectedSong} />
       </div>
     </>
   );

@@ -5,22 +5,25 @@ import {
   ArrowLeftStartOnRectangleIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/16/solid";
-import Explore from "../Pages/Explore";
-import Home from "../Pages/Home";
-import Playlist from "../Pages/Playlist";
 
-export default function SideBar({
-  setTab,
-}: {
-  setTab: (arg: () => JSX.Element) => void;
-}) {
+import { useNavigate } from "react-router-dom";
+
+export default function SideBar() {
   const [isOpen, setIsOpen] = useState(false); // State để theo dõi trạng thái mở/đóng của submenu
-
+  const navigate = useNavigate();
   // Hàm xử lý sự kiện khi click vào Chatbox
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-
+  const navigateToHome = () => {
+    navigate("/home");
+  };
+  const navigateToExplore = () => {
+    navigate("/explore");
+  };
+  const navigateToPlaylist = () => {
+    navigate("/playlist");
+  };
   return (
     <>
       <div className="bg-black hidden lg:block">
@@ -45,7 +48,7 @@ export default function SideBar({
 
           <div
             className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            onClick={() => setTab(Home)}
+            onClick={() => navigateToHome()}
           >
             <HomeIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
@@ -54,7 +57,7 @@ export default function SideBar({
           </div>
           <div
             className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
-            onClick={() => setTab(Explore)}
+            onClick={() => navigateToExplore()}
           >
             <MagnifyingGlassIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
@@ -67,7 +70,7 @@ export default function SideBar({
               className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
               onClick={() => {
                 toggleDropdown();
-                setTab(Playlist);
+                navigateToPlaylist();
               }}
             >
               <MusicalNoteIcon className="w-8 mx-0" />
