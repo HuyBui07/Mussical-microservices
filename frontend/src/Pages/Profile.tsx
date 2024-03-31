@@ -17,7 +17,7 @@ export default function Profile() {
                 <div className="flex flex-col items-center space-y-5 sm:flex-row sm:space-y-0">
                   <img
                     className="object-cover w-40 h-40 p-1 rounded-full ring-2 ring-gray-300 dark:ring-indigraygo-500"
-                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGZhY2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60"
+                    src="https://scontent.fsgn6-1.fna.fbcdn.net/v/t39.30808-1/397292397_2276097585924567_8450428941833084966_n.jpg?stp=dst-jpg_p320x320&_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_ohc=A0JFscO1UiMAX_wAxQt&_nc_ht=scontent.fsgn6-1.fna&oh=00_AfBMqyUs5GKkJQximxHXaZzL0S2QpRJWhSl_vtMxI7xcHw&oe=660ED27B"
                     alt="Bordered avatar"
                   />
                   <div className="flex flex-col space-y-5 sm:ml-8">
