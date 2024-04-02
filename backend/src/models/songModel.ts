@@ -9,7 +9,7 @@ export interface Song {
 const songSchema: Schema = new Schema({
     title: { type: String, required: true },
     artist: { type: String, required: true },
-    file_id: { type: String, required: true },
+    file_url: { type: String, required: true },
 });
 
 export default mongoose.model<Song>('Song', songSchema);
