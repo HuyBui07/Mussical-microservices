@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [error, setError] = useState("");
 
@@ -31,11 +33,16 @@ export default function Login() {
       localStorage.setItem("email", data.email);
       localStorage.setItem("token", data.token);
 
+      dispatch({
+        type: "user/login",
+        payload: { email: data.email, token: data.token },
+      });
+
       navigate("/home");
     } catch (err: any) {
       console.log(err.message);
       setError(err.message);
-    } 
+    }
   };
 
   return (
@@ -105,7 +112,7 @@ export default function Login() {
 
           {error && <p className="text-red-500 mt-5 mb-5">{error}</p>}
 
-          <div>
+          <div className="mt-10">
             <button
               className=" bg-black flex w-full justify-center rounded-md  px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               onClick={handleLogin}

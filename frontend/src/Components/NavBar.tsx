@@ -1,9 +1,11 @@
 import { UserCircleIcon, BellAlertIcon } from "@heroicons/react/16/solid";
 import SearchBar from "./SearchBar";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function NavBar() {
   const navigate = useNavigate();
+  const email = useSelector((state: any) => state.user.email);
   // Hàm xử lý sự kiện khi click vào Chatbox
   const viewProfile = () => {
     navigate("/home/profile");
@@ -18,6 +20,7 @@ export default function NavBar() {
           className="text-white w-8 mr-4 mt-4"
           onClick={() => viewProfile()}
         />
+        <p className="text-white mt-4">{email}</p>
         <BellAlertIcon className="text-white w-8 mr-8 mt-4" />
       </div>
     </div>

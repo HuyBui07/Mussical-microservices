@@ -40,7 +40,7 @@ export default function Register() {
     } catch (err: any) {
       setError(err.message);
     } finally {
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -160,7 +160,7 @@ export default function Register() {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an accout{" "}
             <a
-              href="/login"
+              href="/"
               className="font-semibold leading-6 text-black hover:text-gray-500"
             >
               Sign in
