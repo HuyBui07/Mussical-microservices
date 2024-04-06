@@ -26,6 +26,24 @@ const getAllSongs = async (req: Request, res: Response) => {
   }
 };
 
+const createSong = async (req: Request, res: Response) => {
+  const { title, artist, source, poster } = req.body;
+
+  const song = new Song({
+    title,
+    artist,
+    source,
+    poster,
+  });
+
+  try {
+    const newSong = await song.save();
+    res.status(201).json(newSong);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
 //get metadata from a song id
 const getMetadataFromSongId = async (req: Request, res: Response) => {
   const { song_id } = req.params;
@@ -103,4 +121,4 @@ function authorize(credentials: any, callback: any) {
   callback(oAuth2Client);
 }
 
-export { getAllSongs, getMetadataFromSongId, getSongFile };
+export { getAllSongs, createSong, getMetadataFromSongId, getSongFile };

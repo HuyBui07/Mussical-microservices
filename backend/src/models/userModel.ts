@@ -2,9 +2,12 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
+type Role = "user" | "admin";
+
 interface IUser extends Document {
   email: string;
   passwordHash: string;
+  role: Role;
 }
 
 interface IUserModel extends Model<IUser> {
@@ -14,7 +17,7 @@ interface IUserModel extends Model<IUser> {
 
 const userSchema = new Schema<IUser>({
   email: { type: String, required: true },
-  passwordHash: { type: String, required: true }
+  passwordHash: { type: String, required: true },
 });
 
 userSchema.statics.logIn = async function (email, password) {
@@ -59,7 +62,7 @@ userSchema.statics.signUp = async function (email, password) {
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
 
-  const user = new this({ email, passwordHash: passwordHash });
+  const user = new this({ email, passwordHash: passwordHash, role: "user" });
   await user.save();
   return user;
 };

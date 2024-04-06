@@ -6,11 +6,13 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/16/solid";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux";
 
 export default function SideBar() {
   const [isOpen, setIsOpen] = useState(false); // State để theo dõi trạng thái mở/đóng của submenu
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   // Hàm xử lý sự kiện khi click vào Chatbox
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -24,6 +26,16 @@ export default function SideBar() {
   const navigateToPlaylist = () => {
     navigate("/playlist");
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
+
+    dispatch({type: "user/logout"});
+
+    navigate("/");
+  };
+
   return (
     <>
       <div className="bg-black hidden lg:block">
@@ -106,7 +118,10 @@ export default function SideBar() {
             )}
           </div>
           <div className="my-4 bg-gray-600 h-[1px]" />
-          <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white">
+          <div
+            onClick={handleLogout}
+            className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
+          >
             <ArrowLeftStartOnRectangleIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
               Logout
