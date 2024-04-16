@@ -25,6 +25,20 @@ const createPlaylist = async (
     res.status(400).json({ message: err.message });
   }
 };
+
+const removePlaylist = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const { playlist_id } = req.params;
+
+  try {
+    await Playlist.findByIdAndDelete(playlist_id);
+    res.status(200).json({ message: "Playlist deleted" });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
 const removeSongFromPlaylist = async (
   req: AuthRequest,
   res: Response
@@ -89,4 +103,5 @@ export {
   addSongToPlaylist,
   getAllPlaylists,
   removeSongFromPlaylist,
+  removePlaylist,
 };
