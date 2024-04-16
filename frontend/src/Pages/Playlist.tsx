@@ -5,6 +5,7 @@ import NavBar from "../Components/NavBar";
 import axios from "axios";
 import PlaylistItem from "../Components/PlaylistItem";
 import SongItem from "../Components/SongItem";
+import ConfirmPopup from "../Components/UtilComponents/ConfirmPopup";
 
 const Playlist: React.FC = () => {
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
@@ -14,6 +15,10 @@ const Playlist: React.FC = () => {
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
 
   useEffect(() => {
+    fetchPlaylists();
+  }, []);
+
+  const fetchPlaylists = () => {
     // Fetch playlists of the current user
     const token = localStorage.getItem("token");
     if (token) {
@@ -26,8 +31,7 @@ const Playlist: React.FC = () => {
         .then((res) => setPlaylists(res.data))
         .catch((err) => console.log("Error fetching playlists: ", err));
     }
-  }, []);
-
+  };
   const handlePlaylistSelect = (playlist: PlaylistData) => {
     setSelectedPlaylist(playlist);
   };
@@ -63,6 +67,7 @@ const Playlist: React.FC = () => {
                     key={playlist._id}
                     playlist={playlist}
                     onSelect={handlePlaylistSelect}
+                    onRemove={fetchPlaylists}
                   />
                 ))}
               </div>
@@ -89,6 +94,21 @@ const Playlist: React.FC = () => {
                     songId={songId}
                     onClick={handleSongSelect}
                     playListId={selectedPlaylist._id}
+                    onRemove={() => {
+                      //If play list has 0 song , set null
+                      if (selectedPlaylist.songs.length === 1) {
+                        setSelectedPlaylist(null);
+                      } else {
+                        setSelectedPlaylist({
+                          ...selectedPlaylist,
+                          songs: selectedPlaylist.songs.filter(
+                            (id) => id !== songId
+                          ),
+                        });
+                      }
+
+                      fetchPlaylists();
+                    }}
                   />
                 ))}
               </div>

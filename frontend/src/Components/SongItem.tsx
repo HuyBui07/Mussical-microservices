@@ -1,14 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
-
+import ConfirmPopup from "./UtilComponents/ConfirmPopup";
+import RemoveButton from "./UtilComponents/RemoveButton";
 interface SongItemProps {
   songId: number;
   onClick: (song: SongData) => void;
   playListId: string;
+  onRemove: () => void;
 }
 //Used in Playlist tab to display songs from a playlist
-const SongItem: React.FC<SongItemProps> = ({ songId, onClick, playListId }) => {
+const SongItem: React.FC<SongItemProps> = ({
+  songId,
+  onClick,
+  playListId,
+  onRemove,
+}) => {
   const [song, setSong] = useState<SongData>({
     _id: 0,
     title: "",
@@ -16,7 +24,7 @@ const SongItem: React.FC<SongItemProps> = ({ songId, onClick, playListId }) => {
     poster: "",
     source: "",
   });
-
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   const [length, setLength] = useState<string>("");
   useEffect(() => {
     console.log("Playlist ID: ", playListId);
@@ -39,14 +47,51 @@ const SongItem: React.FC<SongItemProps> = ({ songId, onClick, playListId }) => {
       setLength(`${minutes}:${seconds}`);
     });
   }, []);
+  const removeFromPlaylist = () => {
+    const token = localStorage.getItem("token");
+    // data: JSON.stringify({ file_id: songId }),
+    if (token) {
+      axios
+        .post(
+          `http://localhost:4000/api/playlists/remove/${playListId}`,
+          {
+            file_id: songId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log("Song removed from playlist: ", res.data);
+          onRemove();
+        })
+        .catch((err) => {
+          console.log("Error removing song from playlist: ", err);
+        });
+    }
+  };
+  const handleRemoveClick = () => {
+    setShowPopup(true);
+  };
+
+  const handleConfirmRemove = () => {
+    removeFromPlaylist();
+    setShowPopup(false);
+  };
+
+  const handleCancelRemove = () => {
+    setShowPopup(false);
+  };
   return (
     <>
       {song._id !== 0 ? (
-        <div
-          className="flex flex-row justify-between items-center song-item hover:bg-gray-700 cursor-pointer p-2 rounded-lg my-2 bg-gray-800"
-          onClick={() => onClick(song)}
-        >
-          <div className="flex flex-row items-center space-x-4">
+        <div className="flex flex-row justify-between items-center song-item hover:bg-gray-700 cursor-pointer p-2 rounded-lg my-2 bg-gray-800">
+          <div
+            className="flex flex-row items-center space-x-4"
+            onClick={() => onClick(song)}
+          >
             <img
               src={song.poster}
               alt="none"
@@ -58,9 +103,16 @@ const SongItem: React.FC<SongItemProps> = ({ songId, onClick, playListId }) => {
             </div>
           </div>
           <div className="text-white text-sm ml-4">{length}</div>
+          <RemoveButton onClick={handleRemoveClick} />
         </div>
-      ) : (
-        <> </>
+      ) : null}
+
+      {showPopup && (
+        <ConfirmPopup
+          message="Are you sure you want to remove this song from the playlist?"
+          onConfirm={handleConfirmRemove}
+          onCancel={handleCancelRemove}
+        />
       )}
     </>
   );
