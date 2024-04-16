@@ -7,7 +7,7 @@ const createPlaylist = async (
   res: Response
 ): Promise<void> => {
   const { name } = req.body;
-  const user_id  = req.user?._id;
+  const user_id = req.user?._id;
 
   if (!user_id) {
     res.status(401).json({ message: "Unauthorized request" });
@@ -15,13 +15,35 @@ const createPlaylist = async (
   }
 
   try {
-    const newPlaylist = await Playlist.create({ name, user_id: user_id, songs: []});
+    const newPlaylist = await Playlist.create({
+      name,
+      user_id: user_id,
+      songs: [],
+    });
     res.status(201).json(newPlaylist);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
 };
+const removeSongFromPlaylist = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const { playlist_id } = req.params;
+  const { file_id } = req.body;
 
+  try {
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+      playlist_id,
+      { $pull: { songs: file_id } },
+      { new: true }
+    );
+
+    res.status(200).json(updatedPlaylist);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
 const addSongToPlaylist = async (
   req: AuthRequest,
   res: Response
@@ -60,6 +82,11 @@ const getAllPlaylists = async (
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
-export { createPlaylist, addSongToPlaylist, getAllPlaylists };
+export {
+  createPlaylist,
+  addSongToPlaylist,
+  getAllPlaylists,
+  removeSongFromPlaylist,
+};
