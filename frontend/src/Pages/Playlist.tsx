@@ -6,6 +6,7 @@ import axios from "axios";
 import PlaylistItem from "../Components/PlaylistItem";
 import SongItem from "../Components/SongItem";
 import ConfirmPopup from "../Components/UtilComponents/ConfirmPopup";
+import CreatePlaylistButton from "../Components/UtilComponents/CreatePlaylistButton";
 
 const Playlist: React.FC = () => {
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
@@ -52,12 +53,17 @@ const Playlist: React.FC = () => {
           {/* Display playlists */}
           {!selectedPlaylist ? (
             <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
-              <h2
-                style={{ color: "white" }}
-                className="text-2xl my-4 font-bold"
-              >
-                My Playlists
-              </h2>
+              <div className="flex justify-between items-center">
+                <h2
+                  style={{ color: "white" }}
+                  className="text-2xl my-4 font-bold"
+                >
+                  My Playlists
+                </h2>
+                <CreatePlaylistButton
+                  updatePlaylists={fetchPlaylists}
+                ></CreatePlaylistButton>
+              </div>
               <div
                 className="grid grid-cols-1 gap-y-4"
                 style={{ marginBottom: "1rem" }}
