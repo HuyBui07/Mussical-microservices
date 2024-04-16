@@ -50,7 +50,10 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({
         >
           {playlist.name}
         </div>
-        <div className="text-white text-sm ml-4">
+        <div
+          className="text-white text-sm ml-4"
+          onClick={() => onSelect(playlist)}
+        >
           {playlist.songs.length} songs
         </div>
         <RemoveButton onClick={handleRemoveClick} />
