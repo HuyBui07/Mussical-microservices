@@ -7,7 +7,7 @@ interface SongItemProps {
   onClick: (song: SongData) => void;
   playListId: string;
 }
-
+//Used in Playlist tab to display songs from a playlist
 const SongItem: React.FC<SongItemProps> = ({ songId, onClick, playListId }) => {
   const [song, setSong] = useState<SongData>({
     _id: 0,
