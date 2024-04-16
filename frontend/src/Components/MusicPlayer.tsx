@@ -3,14 +3,6 @@ import React from "react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 
-interface SongData {
-  id: number;
-  title: string;
-  poster: string;
-  artist: string;
-  source: string;
-}
-
 interface MusicPlayerProps {
   selectedSong: SongData | null;
 }
