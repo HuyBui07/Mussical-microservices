@@ -1,8 +1,8 @@
-// PlaylistItem.tsx
 import React, { useState } from "react";
 import RemoveButton from "./UtilComponents/RemoveButton";
 import ConfirmPopup from "./UtilComponents/ConfirmPopup";
 import axios from "axios";
+
 interface PlaylistItemProps {
   playlist: PlaylistData;
   onSelect: (playlist: PlaylistData) => void;
@@ -15,16 +15,20 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({
   onRemove,
 }) => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
+
   const handleRemoveClick = () => {
     setShowPopup(true);
   };
+
   const handleRemoveCancel = () => {
     setShowPopup(false);
   };
+
   const handleRemoveConfirm = () => {
     setShowPopup(false);
     removePlaylist(playlist._id);
   };
+
   const removePlaylist = (playlistId: string) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -38,6 +42,7 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({
         .catch((err) => console.log("Error deleting playlist: ", err));
     }
   };
+
   return (
     <>
       <div
@@ -45,22 +50,23 @@ const PlaylistItem: React.FC<PlaylistItemProps> = ({
         style={{ padding: "0.62em 1em" }}
       >
         <div
-          className="text-white text-lg font-bold"
           onClick={() => onSelect(playlist)}
+          className="flex flex-row items-center space-x-4 flex-grow basis-1 justify-between mr-4"
         >
-          {playlist.name}
+          <div className="text-white text-lg font-bold">{playlist.name}</div>
+          <div className="text-white text-sm ml-4">
+            {playlist.songs.length} songs
+          </div>
         </div>
-        <div
-          className="text-white text-sm ml-4"
-          onClick={() => onSelect(playlist)}
-        >
-          {playlist.songs.length} songs
+
+        <div className="z-10">
+          <RemoveButton onClick={handleRemoveClick} />
         </div>
-        <RemoveButton onClick={handleRemoveClick} />
       </div>
+
       {showPopup && (
         <ConfirmPopup
-          message="Are you sure you want to remove this song from the playlist?"
+          message="Are you sure you want to remove this playlist?"
           onConfirm={handleRemoveConfirm}
           onCancel={handleRemoveCancel}
         />
