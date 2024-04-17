@@ -1,19 +1,28 @@
 // Song component
-import React from "react";
+
 import { PlayCircleIcon } from "@heroicons/react/16/solid";
+import AddButton from "./UtilComponents/AddButton";
+
 interface SongProps {
   data: {
-    id: number;
+    _id: number;
     title: string;
     poster: string;
   };
   onClick: () => void;
+  onClickAdd: () => void;
 }
-
-const Song: React.FC<SongProps> = ({ data, onClick }) => {
+//Used in song discovery/ search results
+const Song: React.FC<SongProps> = ({ data, onClick, onClickAdd }) => {
   return (
-    <a className="group relative" onClick={onClick}>
-      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+    <a className="group relative">
+      <div className="absolute top-1 right-1 z-10">
+        <AddButton onClick={onClickAdd} />
+      </div>
+      <div
+        className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7"
+        onClick={onClick}
+      >
         <img
           src={data.poster}
           alt="none"
