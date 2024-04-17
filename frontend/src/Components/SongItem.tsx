@@ -10,7 +10,7 @@ interface SongItemProps {
   playListId: string;
   onRemove: () => void;
 }
-//Used in Playlist tab to display songs from a playlist
+// Used in Playlist tab to display songs from a playlist
 const SongItem: React.FC<SongItemProps> = ({
   songId,
   onClick,
