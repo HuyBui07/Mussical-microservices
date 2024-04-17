@@ -12,8 +12,11 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
   onCancel,
 }) => {
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-4 rounded-lg">
+    <div
+      className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="bg-white p-4 rounded-lg z-50">
         <p className="text-center text-black">{message}</p>
         <div className="flex justify-center mt-4">
           <button
@@ -22,7 +25,13 @@ const ConfirmPopup: React.FC<ConfirmPopupProps> = ({
           >
             Confirm
           </button>
-          <button className="px-4 py-2 bg-gray-300 rounded" onClick={onCancel}>
+          <button
+            className="px-4 py-2 bg-gray-300 rounded"
+            onClick={(e) => {
+              onCancel();
+              e.stopPropagation();
+            }}
+          >
             Cancel
           </button>
         </div>
