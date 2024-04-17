@@ -44,12 +44,16 @@ const SongItem: React.FC<SongItemProps> = ({
     audio.addEventListener("loadedmetadata", () => {
       const minutes = Math.floor(audio.duration / 60);
       const seconds = Math.floor(audio.duration - minutes * 60);
+      if (seconds < 10) {
+        setLength(`${minutes}:0${seconds}`);
+        return;
+      }
       setLength(`${minutes}:${seconds}`);
     });
   }, []);
   const removeFromPlaylist = () => {
     const token = localStorage.getItem("token");
-    // data: JSON.stringify({ file_id: songId }),
+
     if (token) {
       axios
         .post(
@@ -89,20 +93,23 @@ const SongItem: React.FC<SongItemProps> = ({
       {song._id !== 0 ? (
         <div className="flex flex-row justify-between items-center song-item hover:bg-gray-700 cursor-pointer p-2 rounded-lg my-2 bg-gray-800">
           <div
-            className="flex flex-row items-center space-x-4"
+            className="flex flex-row items-center space-x-4 flex-grow justify-between mr-4"
             onClick={() => onClick(song)}
           >
-            <img
-              src={song.poster}
-              alt="none"
-              className="h-16 w-16 object-cover object-center rounded-lg"
-            />
-            <div className="flex flex-col ml-4">
-              <div className="text-white font-bold">{song.title}</div>
-              <div className="text-white text-sm">{song.artist}</div>
+            <div className="flex flex-row items-center">
+              <img
+                src={song.poster}
+                alt="none"
+                className="h-16 w-16 object-cover object-center rounded-lg"
+              />
+              <div className="flex flex-col ml-4">
+                <div className="text-white font-bold">{song.title}</div>
+                <div className="text-white text-sm">{song.artist}</div>
+              </div>
             </div>
+            <div className="text-white text-sm ml-4">{length}</div>
           </div>
-          <div className="text-white text-sm ml-4">{length}</div>
+
           <RemoveButton onClick={handleRemoveClick} />
         </div>
       ) : null}
