@@ -37,11 +37,11 @@ export default function Register() {
 
       localStorage.setItem("email", data.email);
       localStorage.setItem("token", data.token);
+
+      navigate("/");
     } catch (err: any) {
       setError(err.message);
-    } finally {
-      navigate("/");
-    }
+    } 
   };
 
   return (
