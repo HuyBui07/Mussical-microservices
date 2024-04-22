@@ -5,19 +5,13 @@ import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/16/solid";
 import Song from "../Components/Song";
 import MusicPlayer from "../Components/MusicPlayer";
 import axios from "axios";
-
-interface SongData {
-  id: number;
-  title: string;
-  poster: string;
-  artist: string;
-  source: string;
-}
+import AddToPlaylistPopup from "../Components/UtilComponents/AddToPlaylistPopup";
 
 export default function Home() {
   const [songs, setSongs] = useState<SongData[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
-
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
   useEffect(() => {
     axios
       .get<SongData[]>("http://localhost:4000/api/songs/all")
@@ -28,7 +22,13 @@ export default function Home() {
   const handleSongClick = (song: SongData) => {
     setSelectedSong(song);
   };
-
+  const handleAddToPlaylistPopup = () => {
+    setShowPopup(true);
+  };
+  const handleCancelAddToPlaylist = () => {
+    setCurrentAddSong(null);
+    setShowPopup(false);
+  };
   return (
     <>
       <div
@@ -49,9 +49,13 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {songs.map((song) => (
                 <Song
-                  key={song.id}
+                  key={song._id}
                   data={song}
                   onClick={() => handleSongClick(song)}
+                  onClickAdd={() => {
+                    setCurrentAddSong(song);
+                    handleAddToPlaylistPopup();
+                  }}
                 />
               ))}
             </div>
@@ -67,9 +71,13 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {songs.map((song) => (
                 <Song
-                  key={song.id}
+                  key={song._id}
                   data={song}
                   onClick={() => handleSongClick(song)}
+                  onClickAdd={() => {
+                    setCurrentAddSong(song);
+                    handleAddToPlaylistPopup();
+                  }}
                 />
               ))}
             </div>
@@ -79,6 +87,14 @@ export default function Home() {
       <div className="mx-2  ml-4 bg-zinc-800" style={{ borderRadius: "10px" }}>
         <MusicPlayer selectedSong={selectedSong} />
       </div>
+      {showPopup && (
+        <AddToPlaylistPopup
+          songId={currentAddSong?._id}
+          message="Add to Playlist"
+          afterConfirm={() => setShowPopup(false)}
+          onCancel={handleCancelAddToPlaylist}
+        />
+      )}
     </>
   );
 }
