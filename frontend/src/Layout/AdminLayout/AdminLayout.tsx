@@ -1,15 +1,15 @@
 import PropTypes from "prop-types";
 import { ReactNode } from "react";
-import SideBar from "../../Components/SideBar";
+import AdminSideBar from "../../Components/AdminSidebar";
 
-function DefaultLayout({ children }: { children: ReactNode }) {
+function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex flex-grow">
         <div className="w-1/5">
-          <SideBar />
+          <AdminSideBar />
         </div>
-        <div className="flex-grow w-4/5">
+        <div className="flex-grow">
           <div>{children}</div>
         </div>
       </div>
@@ -17,8 +17,8 @@ function DefaultLayout({ children }: { children: ReactNode }) {
   );
 }
 
-DefaultLayout.propTypes = {
+AdminLayout.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default DefaultLayout;
+export default AdminLayout;

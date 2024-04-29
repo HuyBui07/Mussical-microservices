@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
-import MusicPlayer from "../Components/MusicPlayer";
-import NavBar from "../Components/NavBar";
+import MusicPlayer from "../../Components/MusicPlayer";
+import NavBar from "../../Components/NavBar";
 import axios from "axios";
-import PlaylistItem from "../Components/PlaylistItem";
-import SongItem from "../Components/SongItem";
-import ConfirmPopup from "../Components/UtilComponents/ConfirmPopup";
-import CreatePlaylistButton from "../Components/UtilComponents/CreatePlaylistButton";
+import PlaylistItem from "../../Components/PlaylistItem";
+import SongItem from "../../Components/SongItem";
+import ConfirmPopup from "../../Components/UtilComponents/ConfirmPopup";
+import CreatePlaylistButton from "../../Components/UtilComponents/CreatePlaylistButton";
 
 const Playlist: React.FC = () => {
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
