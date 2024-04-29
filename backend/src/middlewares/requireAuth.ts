@@ -12,6 +12,7 @@ interface JwtPayload {
 
 interface AuthRequest extends Request {
   user?: UserType;
+  token?: string;
 }
 
 const requireAuth = async (
@@ -34,6 +35,7 @@ const requireAuth = async (
       process.env.SECRET_KEY as string
     ) as JwtPayload;
     req.user = await User.findById(_id).select("_id");
+    req.token = token;
     next();
   } catch (err: any) {
     console.log(err);
