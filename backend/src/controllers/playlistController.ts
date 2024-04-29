@@ -44,12 +44,12 @@ const removeSongFromPlaylist = async (
   res: Response
 ): Promise<void> => {
   const { playlist_id } = req.params;
-  const { file_id } = req.body;
+  const { song_id } = req.body;
 
   try {
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
       playlist_id,
-      { $pull: { songs: file_id } },
+      { $pull: { songs: song_id } },
       { new: true }
     );
 
@@ -63,12 +63,12 @@ const addSongToPlaylist = async (
   res: Response
 ): Promise<void> => {
   const { playlist_id } = req.params;
-  const { file_id } = req.body;
+  const { song_id } = req.body;
 
   try {
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
       playlist_id,
-      { $addToSet: { songs: file_id } },
+      { $addToSet: { songs: song_id } },
       { new: true }
     );
 

@@ -18,6 +18,6 @@ router.post("/create", createPlaylist);
 router.post("/add/:playlist_id", addSongToPlaylist);
 router.post("/remove/:playlist_id", removeSongFromPlaylist);
 router.get("/all", getAllPlaylists);
-router.delete("/:playlist_id", removePlaylist);
+router.delete("/delete/:playlist_id", removePlaylist);
 
 export default router;
