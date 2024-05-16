@@ -5,3 +5,10 @@ export interface SongProps {
   source: string;
   poster: string;
 }
+
+export interface AlbumProps {
+  id: number;
+  name: string;
+  artist: string;
+  listSongs: SongProps[];
+}
