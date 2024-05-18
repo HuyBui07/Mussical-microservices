@@ -36,12 +36,12 @@ export default function Home() {
   return (
     <>
       <div
-        className="m-2 ml-4 bg-zinc-800 h-[80%] "
+        className="m-2 ml-4 bg-zinc-800 h-full"
         style={{ borderRadius: "10px" }}
       >
         <NavBar />
         <div className="my-[14px] mx-3 bg-gray-600 h-[1px]" />
-        <div style={{ overflow: "auto", maxHeight: "500px" }}>
+        <div className="h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
               <h2 className="text-md text-white my-4">Recent Songs</h2>
@@ -88,7 +88,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="mx-2  ml-4 bg-zinc-800" style={{ borderRadius: "10px" }}>
+      <div className="mx-2 ml-4 bg-zinc-800" style={{ borderRadius: "10px" }}>
         <MusicPlayer selectedSong={selectedSong} />
       </div>
       {showPopup && (
