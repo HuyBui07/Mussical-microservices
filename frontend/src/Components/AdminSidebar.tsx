@@ -1,8 +1,8 @@
 import {
-  HomeIcon,
+  ChartBarIcon,
   MusicalNoteIcon,
+  UserIcon,
   ArrowLeftStartOnRectangleIcon,
-  MagnifyingGlassIcon,
 } from "@heroicons/react/16/solid";
 
 import { useNavigate } from "react-router-dom";
@@ -57,7 +57,7 @@ export default function AdminSideBar() {
             className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
             onClick={() => navigateToStatistic()}
           >
-            <HomeIcon className="w-8 mx-0" />
+            <ChartBarIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
               Statistics
             </span>
@@ -66,7 +66,7 @@ export default function AdminSideBar() {
             className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
             onClick={() => navigateToSong()}
           >
-            <MagnifyingGlassIcon className="w-8 mx-0" />
+            <MusicalNoteIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
               Songs
             </span>
@@ -75,9 +75,9 @@ export default function AdminSideBar() {
             className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
             onClick={() => navigateToUser()}
           >
-            <MusicalNoteIcon className="w-8 mx-0" />
+            <UserIcon className="w-8 mx-0" />
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
-              Songs
+              Users
             </span>
           </div>
           <div className="my-4 bg-gray-600 h-[1px]" />

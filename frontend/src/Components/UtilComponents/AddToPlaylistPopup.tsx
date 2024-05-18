@@ -25,6 +25,7 @@ const AddToPlaylistPopup = ({
       })
       .then((res) => setPlaylists(res.data))
       .catch((err) => console.log("Error fetching playlist: ", err));
+    console.log("playlists", playlists);
   }, []);
 
   const handleAddToPlaylist = (playlist: PlaylistData) => {
@@ -32,7 +33,7 @@ const AddToPlaylistPopup = ({
       .post(
         `http://localhost:4000/api/playlists/add/${playlist._id}`,
         {
-          file_id: songId,
+          song_id: songId,
         },
         {
           headers: {
@@ -44,6 +45,7 @@ const AddToPlaylistPopup = ({
         afterConfirm(playlist);
       })
       .catch((err) => console.log("Error adding song to playlist: ", err));
+    console.log("playlist", playlist);
   };
 
   return (

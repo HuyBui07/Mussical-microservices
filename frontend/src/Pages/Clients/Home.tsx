@@ -14,7 +14,11 @@ export default function Home() {
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
   useEffect(() => {
     axios
-      .get<SongData[]>("http://localhost:4000/api/songs/all")
+      .get<SongData[]>("http://localhost:4000/api/songs/all", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => setSongs(res.data))
       .catch((err) => console.log(err));
   }, []);

@@ -1,130 +1,238 @@
+import { useState } from "react";
+import SongTable from "../../Components/Admin/Song/SongTable";
+
+import { AlbumProps, SongProps } from "../../Type/type";
+import EditSongModal from "../../Components/Admin/Song/EditSongModal";
+import AddSongModal from "../../Components/Admin/Song/AddSongModal";
+import AlbumTable from "../../Components/Admin/Song/AlbumTable";
+import EditAlbumModal from "../../Components/Admin/Song/EditAlbumModal";
+import AddNewAlbumModal from "../../Components/Admin/Song/AddNewAlbumModal";
 export default function Songs() {
+  const [isModalAddSongOpen, setIsModalAddSongOpen] = useState(false);
+  const [isModalAddAlbumOpen, setIsModalAddAlbumOpen] = useState(false);
+  const [isModalEditSongOpen, setIsModalEditSongOpen] = useState(false);
+  const [isModalEditAlbumOpen, setIsModalEditAlbumOpen] = useState(false);
+
+  const [selectedSong, setSelectedSong] = useState<SongProps | null>(null);
+  const [formData, setFormData] = useState<SongProps>({
+    id: 0,
+    title: "",
+    artist: "",
+    source: "",
+    poster: "",
+  });
+  const [albumFormData, setAlbumFormData] = useState<AlbumProps>({
+    id: 0,
+    name: "",
+    artist: "",
+    listSongs: [],
+  });
+  const data: SongProps[] = [
+    {
+      id: 1,
+      title: "Shape of You",
+
+      artist: "Ed Sheeran",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 2,
+      title: "Someone Like You",
+
+      artist: "Adele",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 3,
+      title: "Bohemian Rhapsody",
+
+      artist: "Freddie Mercury",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 4,
+      title: "Hello",
+
+      artist: "Adele",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 5,
+      title: "Perfect",
+
+      artist: "Ed Sheeran",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 6,
+      title: "Rolling in the Deep",
+
+      artist: "Adele",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 7,
+      title: "Thinking Out Loud",
+
+      artist: "Ed Sheeran",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 8,
+      title: "Bohemian Rhapsody",
+
+      artist: "Freddie Mercury",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 9,
+      title: "Someone You Loved",
+
+      artist: "Lewis Capaldi",
+      source: "",
+      poster: "",
+    },
+    {
+      id: 10,
+      title: "Happier",
+
+      artist: "Ed Sheeran",
+      source: "",
+      poster: "",
+    },
+  ];
+
+  const handleEditSong = (song: SongProps) => {
+    setSelectedSong(song);
+    setFormData({ ...song });
+    setIsModalEditSongOpen(true);
+  };
+  const handleSaveSong = () => {
+    // Add logic to save edited data
+    setIsModalEditSongOpen(false);
+  };
+
+  const handleImportSong = () => {
+    // Add logic to save edited data
+    setIsModalAddSongOpen(true);
+  };
+
+  // Function to handle importing
+  //Return SongProps
+  const handleSaveImportSong = () => {
+    // Logic for importing
+    setIsModalAddSongOpen(false); // Open modal for importing
+  };
+
+  const handleEditAlbum = (song: SongProps) => {
+    setSelectedSong(song);
+    setFormData({ ...song });
+    setIsModalEditAlbumOpen(true);
+  };
+
+  const handleSaveAlbum = () => {
+    // Add logic to save edited data
+    setIsModalEditAlbumOpen(false);
+  };
+  const handleImportAlbum = () => {
+    // Add logic to save edited data
+    setIsModalAddAlbumOpen(true);
+  };
+
+  const handleSaveImportAlbum = () => {
+    // Logic for importing
+    setIsModalAddAlbumOpen(false); // Open modal for importing
+  };
+  const closeModal = () => {
+    // tạm thời thôi nhớ sửa nha
+    setIsModalEditAlbumOpen(false);
+    setIsModalEditSongOpen(false);
+    setIsModalAddAlbumOpen(false);
+    setIsModalAddSongOpen(false);
+    setSelectedSong(null);
+    setFormData({
+      id: 0,
+      title: "",
+
+      artist: "",
+      source: "",
+      poster: "",
+    });
+  };
+
   return (
-    <div
-      className="m-2  ml-4 bg-zinc-800 h-[98vh]"
-      style={{ borderRadius: "10px" }}
-    >
-      <div className="flex flex-col">
-        <div className="m-1.5 overflow-x-auto flex-grow">
-          <div className="p-1.5 min-w-full inline-block align-middle">
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-5 text-start text-sm font-medium text-white uppercase"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-start text-sm font-medium text-white uppercase"
-                    >
-                      Singer
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-start text-sm font-medium text-white uppercase"
-                    >
-                      Artist
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-end text-sm font-medium text-white uppercase"
-                    >
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                      Chúng ta của hiện tại
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                      Chúng ta của hiện tại
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                      Chúng ta của hiện tại
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                      Sơn Tùng MTP
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <>
+      {/* Songs Management */}
+      <div
+        className="m-2  ml-4 bg-zinc-800 h-[48vh] overflow-auto"
+        style={{ borderRadius: "10px" }}
+      >
+        <div className="flex justify-between items-center mb-4 ">
+          <p className="font-bold text-xl ml-6 mt-6">Songs</p>
+          <button
+            onClick={handleImportSong}
+            className="mt-6 mr-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Import
+          </button>
         </div>
+        {/* Table displaying songs */}
+        <SongTable data={data} handleEditSong={handleEditSong} />
       </div>
-    </div>
+
+      {/* Modal for Editing*/}
+      {isModalEditSongOpen && (
+        <EditSongModal
+          setFormData={setFormData}
+          formData={formData}
+          closeModal={closeModal}
+          handleSaveSong={handleSaveSong}
+        />
+      )}
+
+      {/* Modal for Adding new Songs*/}
+      {isModalAddSongOpen && (
+        <AddSongModal
+          setFormData={setFormData}
+          formData={formData}
+          closeModal={closeModal}
+          handleSaveImportSong={handleSaveImportSong}
+        />
+      )}
+
+      {/* Albums Management */}
+      <AlbumTable
+        data={data}
+        handleEditAlbum={handleEditAlbum}
+        handleImportAlbum={handleImportAlbum}
+      />
+      {/* Modal for Editing */}
+      {isModalEditAlbumOpen && (
+        <EditAlbumModal
+          setFormData={setFormData}
+          formData={formData}
+          closeModal={closeModal}
+          handleSaveAlbum={handleSaveAlbum}
+        />
+      )}
+
+      {/* Modal for Import new Albums */}
+      {isModalAddAlbumOpen && (
+        <AddNewAlbumModal
+          setFormData={setAlbumFormData}
+          formData={albumFormData}
+          closeModal={closeModal}
+          handleSaveImportAlbum={handleSaveImportAlbum}
+        />
+      )}
+    </>
   );
 }
