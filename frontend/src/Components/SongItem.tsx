@@ -59,7 +59,7 @@ const SongItem: React.FC<SongItemProps> = ({
         .post(
           `http://localhost:4000/api/playlists/remove/${playListId}`,
           {
-            file_id: songId,
+            song_id: songId,
           },
           {
             headers: {
