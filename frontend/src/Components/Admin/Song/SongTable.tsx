@@ -1,11 +1,11 @@
-import { SongProps } from "../../../Type/type";
+import { AdminSongItem } from "../../../Pages/Admin/Songs";
 
 const SongTable = ({
   data,
   handleEditSong,
 }: {
-  data: SongProps[];
-  handleEditSong: (song: SongProps) => void;
+  data: AdminSongItem[];
+  handleEditSong: (song: AdminSongItem) => void;
 }) => {
   return (
     <div className="pb-8 overflow-x-auto mr-2">
@@ -27,6 +27,13 @@ const SongTable = ({
               </th>
               <th
                 scope="col"
+                className="px-6 py-3 text-end text-sm font-medium text-white uppercase"
+              >
+                Listen count
+              </th>
+
+              <th
+                scope="col"
                 className="px-8 py-3 text-end text-sm font-medium text-white uppercase"
               >
                 Action
@@ -37,7 +44,7 @@ const SongTable = ({
         <div className="overflow-y-auto" style={{ maxHeight: "60vh" }}>
           <table className="min-w-full divide-y divide-neutral-700">
             <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-              {data.map((song: SongProps) => (
+              {data.map((song: AdminSongItem) => (
                 <tr
                   key={song.id}
                   className="hover:bg-gray-600 dark:hover:bg-neutral-800"
@@ -47,6 +54,9 @@ const SongTable = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 dark:text-neutral-100">
                     {song.artist}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 dark:text-neutral-100">
+                    {song.listenCount}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
                     <button

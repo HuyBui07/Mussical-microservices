@@ -75,6 +75,18 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
   }
 };
 
+//increase listen count of a song
+const increaseListenCount = async (req: Request, res: Response) => {
+  const { song_id } = req.params;
+
+  try {
+    await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
+    res.status(200).json({ message: "Listen count increased" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 //delete a song
 const deleteSong = async (req: Request, res: Response) => {
   const { song_id } = req.params;
@@ -100,4 +112,10 @@ const deleteSong = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllSongs, createSong, getMetadataFromSongId, deleteSong };
+export {
+  getAllSongs,
+  createSong,
+  getMetadataFromSongId,
+  deleteSong,
+  increaseListenCount,
+};
