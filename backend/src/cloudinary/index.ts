@@ -83,3 +83,6 @@ export const multerSongUploader = upload.fields([
   { name: "posterFile", maxCount: 1 },
   { name: "sourceFile", maxCount: 1 },
 ]);
+
+//Export cloudinary client
+export default cloudinaryClient;

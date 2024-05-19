@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import fs from "fs";
 import { Request, Response } from "express";
-import { cloudinaryUploader } from "../cloudinary";
+import cloudinaryClient, { cloudinaryUploader } from "../cloudinary";
 //model
 import Song from "../models/songModel";
 
@@ -76,6 +76,19 @@ const deleteSong = async (req: Request, res: Response) => {
 
   try {
     const song = await Song.findByIdAndDelete(song_id);
+    //Call the cloudinary api to delete the poster and source
+    const posterUrl = song?.poster;
+    const sourceUrl = song?.source;
+    if (posterUrl && sourceUrl) {
+      const publicIdPoster = posterUrl.split("/").pop()?.split(".")[0];
+      const publicIdSource = sourceUrl.split("/").pop()?.split(".")[0];
+      if (publicIdPoster && publicIdSource) {
+        await Promise.all([
+          cloudinaryClient.uploader.destroy(publicIdPoster),
+          cloudinaryClient.uploader.destroy(publicIdSource),
+        ]);
+      }
+    }
     res.status(200).json(song);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
