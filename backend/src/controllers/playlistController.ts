@@ -71,7 +71,8 @@ const addSongToPlaylist = async (
       { $addToSet: { songs: song_id } },
       { new: true }
     );
-
+    console.log(updatedPlaylist);
+    console.log(song_id);
     res.status(200).json(updatedPlaylist);
   } catch (err: any) {
     res.status(400).json({ message: err.message });
