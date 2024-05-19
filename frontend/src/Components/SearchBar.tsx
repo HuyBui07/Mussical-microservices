@@ -1,7 +1,42 @@
+import { useState } from "react";
+import axios from "axios";
+
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
-export default function SearchBar(): JSX.Element {
+export default function SearchBar({
+  setSearchedSongs,
+  invisible = false,
+}: {
+  setSearchedSongs?: (songs: SongData[]) => void;
+  invisible?: boolean;
+}): JSX.Element {
+  const handleSearch = (searchText: string) => {
+    if (!setSearchedSongs) {
+      return;
+    }
+    if (!searchText) {
+      setSearchedSongs([]);
+      return;
+    }
+    axios
+      .get<SongData[]>("http://localhost:4000/api/songs/all", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: { title: searchText },
+      })
+      .then((res) => {
+        setSearchedSongs(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
-    <form className="ml-6 mt-4 flex items-center max-w-sm mx-auto w-[500px]">
+    <form
+      className={`ml-6 mt-4 flex items-center max-w-sm mx-auto w-[500px] ${
+        invisible ? "invisible" : ""
+      }`}
+      hidden={invisible}
+    >
       <label htmlFor="simple-search" className="sr-only text-white">
         Search
       </label>
@@ -12,8 +47,9 @@ export default function SearchBar(): JSX.Element {
         <input
           type="text"
           id="simple-search"
-          className="text-white bg-zinc-400 py-2 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-12"
-          placeholder="Search branch name..."
+          className="text-white bg-zinc-400 py-2 border border-gray-300 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-12"
+          placeholder="Input song title..."
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
     </form>

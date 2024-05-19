@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import MusicPlayer from "../../Components/MusicPlayer";
-import NavBar from "../../Components/NavBar";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/16/solid";
 import Song from "../../Components/Song";
 import axios from "axios";
 import AddToPlaylistPopup from "../../Components/UtilComponents/AddToPlaylistPopup";
+import SearchBar from "../../Components/SearchBar";
 
 export default function Explore() {
-  const [songs, setSongs] = useState<SongData[]>([]);
+  const [searchedSongs, setSearchedSongs] = useState<SongData[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
 
-  useEffect(() => {
-    axios
-      .get<SongData[]>("http://localhost:4000/api/songs/all", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => setSongs(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get<SongData[]>("http://localhost:4000/api/songs/all", {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //     })
+  //     .then((res) => setSearchedSongs(res.data))
+  //     .catch((err) => console.log(err));
+  // }, []);
 
   const handleSongClick = (song: SongData) => {
     setSelectedSong(song);
@@ -40,25 +40,19 @@ export default function Explore() {
   return (
     <>
       <div
-        className="m-2 mb-8 ml-4 bg-zinc-800 h-[80%] "
+        className="m-2 mb-8 ml-4 bg-zinc-800 h-full "
         style={{ borderRadius: "10px" }}
       >
-        <NavBar />
+        <div className="flex mt-2">
+          <SearchBar setSearchedSongs={setSearchedSongs}/>
+        </div>
 
         <div className="my-[14px] mx-3 bg-gray-600 h-[1px]" />
 
-        <div style={{ overflow: "auto", maxHeight: "500px" }}>
+        <div className="h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
-            <div className="flex flex-row justify-between">
-              <h2 className="text-md text-white my-4">Recent Songs</h2>
-              <div className="flex flex-row">
-                <ChevronLeftIcon className="w-6" />
-                <ChevronRightIcon className="w-6" />
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {songs.map((song) => (
+              {searchedSongs.map((song) => (
                 <Song
                   key={song._id}
                   data={song}
@@ -69,7 +63,7 @@ export default function Explore() {
             </div>
           </div>
 
-          <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
+          {/* <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
               <h2 className="text-md text-white my-4">Recommended</h2>
               <div className="flex flex-row">
@@ -79,7 +73,7 @@ export default function Explore() {
             </div>
 
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {songs.map((song) => (
+              {searchedSongs.map((song) => (
                 <Song
                   key={song._id}
                   data={song}
@@ -88,7 +82,7 @@ export default function Explore() {
                 />
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
