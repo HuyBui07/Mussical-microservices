@@ -58,11 +58,11 @@ export default function Home() {
             <p className="text-white">{email}</p>
           </div>
         </div>
-        <div className="my-[14px] mx-3 bg-gray-600 h-[1px]" />
-        <div className="h-[70vh]" style={{ overflow: "auto" }}>
+        <div className="mt-[14px] mx-3 bg-gray-600 h-[1px]" />
+        <div className="mt-[14px] h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-md text-white my-4">Recent Songs</h2>
+              <h2 className="text-lg text-white my-4 font-bold">Recent Songs</h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
@@ -82,9 +82,9 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
+          <div className="mt-[14px] mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-md text-white my-4">Top Picks For You</h2>
+              <h2 className="text-lg text-white my-4 font-bold">Top Picks For You</h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
