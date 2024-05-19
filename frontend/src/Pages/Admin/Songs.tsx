@@ -1,17 +1,14 @@
 import { useState } from "react";
 import SongTable from "../../Components/Admin/Song/SongTable";
 
-import { AlbumProps, SongProps } from "../../Type/type";
+import { SongProps } from "../../Type/type";
 import EditSongModal from "../../Components/Admin/Song/EditSongModal";
 import AddSongModal from "../../Components/Admin/Song/AddSongModal";
-import AlbumTable from "../../Components/Admin/Song/AlbumTable";
-import EditAlbumModal from "../../Components/Admin/Song/EditAlbumModal";
-import AddNewAlbumModal from "../../Components/Admin/Song/AddNewAlbumModal";
+
 export default function Songs() {
   const [isModalAddSongOpen, setIsModalAddSongOpen] = useState(false);
-  const [isModalAddAlbumOpen, setIsModalAddAlbumOpen] = useState(false);
+
   const [isModalEditSongOpen, setIsModalEditSongOpen] = useState(false);
-  const [isModalEditAlbumOpen, setIsModalEditAlbumOpen] = useState(false);
 
   const [selectedSong, setSelectedSong] = useState<SongProps | null>(null);
   const [formData, setFormData] = useState<SongProps>({
@@ -21,12 +18,7 @@ export default function Songs() {
     source: "",
     poster: "",
   });
-  const [albumFormData, setAlbumFormData] = useState<AlbumProps>({
-    id: 0,
-    name: "",
-    artist: "",
-    listSongs: [],
-  });
+
   const data: SongProps[] = [
     {
       id: 1,
@@ -130,38 +122,17 @@ export default function Songs() {
   const handleSaveImportSong = () => {
     // Logic for importing
     setIsModalAddSongOpen(false); // Open modal for importing
+    closeModal();
   };
 
-  const handleEditAlbum = (song: SongProps) => {
-    setSelectedSong(song);
-    setFormData({ ...song });
-    setIsModalEditAlbumOpen(true);
-  };
-
-  const handleSaveAlbum = () => {
-    // Add logic to save edited data
-    setIsModalEditAlbumOpen(false);
-  };
-  const handleImportAlbum = () => {
-    // Add logic to save edited data
-    setIsModalAddAlbumOpen(true);
-  };
-
-  const handleSaveImportAlbum = () => {
-    // Logic for importing
-    setIsModalAddAlbumOpen(false); // Open modal for importing
-  };
   const closeModal = () => {
     // tạm thời thôi nhớ sửa nha
-    setIsModalEditAlbumOpen(false);
     setIsModalEditSongOpen(false);
-    setIsModalAddAlbumOpen(false);
     setIsModalAddSongOpen(false);
     setSelectedSong(null);
     setFormData({
       id: 0,
       title: "",
-
       artist: "",
       source: "",
       poster: "",
@@ -172,7 +143,7 @@ export default function Songs() {
     <>
       {/* Songs Management */}
       <div
-        className="m-2  ml-4 bg-zinc-800 h-[48vh] overflow-auto"
+        className="m-2  ml-4 bg-zinc-800 h-[80vh]"
         style={{ borderRadius: "10px" }}
       >
         <div className="flex justify-between items-center mb-4 ">
@@ -201,36 +172,8 @@ export default function Songs() {
       {/* Modal for Adding new Songs*/}
       {isModalAddSongOpen && (
         <AddSongModal
-          setFormData={setFormData}
-          formData={formData}
           closeModal={closeModal}
-          handleSaveImportSong={handleSaveImportSong}
-        />
-      )}
-
-      {/* Albums Management */}
-      <AlbumTable
-        data={data}
-        handleEditAlbum={handleEditAlbum}
-        handleImportAlbum={handleImportAlbum}
-      />
-      {/* Modal for Editing */}
-      {isModalEditAlbumOpen && (
-        <EditAlbumModal
-          setFormData={setFormData}
-          formData={formData}
-          closeModal={closeModal}
-          handleSaveAlbum={handleSaveAlbum}
-        />
-      )}
-
-      {/* Modal for Import new Albums */}
-      {isModalAddAlbumOpen && (
-        <AddNewAlbumModal
-          setFormData={setAlbumFormData}
-          formData={albumFormData}
-          closeModal={closeModal}
-          handleSaveImportAlbum={handleSaveImportAlbum}
+          afterSave={handleSaveImportSong}
         />
       )}
     </>

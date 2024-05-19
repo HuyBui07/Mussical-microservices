@@ -20,7 +20,7 @@ const createAlbum = async (req: AuthRequest, res: Response): Promise<void> => {
   const { title, poster } = req.body;
 
   try {
-    const album = new Album({ title, poster, songs: []});
+    const album = new Album({ title, poster, songs: [] });
     await album.save();
     res.status(201).json(album);
   } catch (err: any) {
@@ -75,14 +75,20 @@ const deleteSongFromAlbum = async (
 };
 
 const deleteAlbum = async (req: AuthRequest, res: Response): Promise<void> => {
-  const { album_id } = req.params;
+  const { id } = req.params;
 
   try {
-    await Album.findByIdAndDelete(album_id);
+    await Album.findByIdAndDelete(id);
     res.status(200).json({ message: "Album deleted" });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
 };
 
-export { getAllAlbums, createAlbum, addSongToAlbum, deleteSongFromAlbum, deleteAlbum};
+export {
+  getAllAlbums,
+  createAlbum,
+  addSongToAlbum,
+  deleteSongFromAlbum,
+  deleteAlbum,
+};

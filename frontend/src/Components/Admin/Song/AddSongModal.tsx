@@ -1,18 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import FormField from "../../UtilComponents/FormField";
-import { SongProps } from "../../../Type/type";
+
+interface SongUploadProps {
+  title: string;
+  artist: string;
+  posterFile: File | undefined | null;
+  sourceFile: File | undefined | null;
+}
 
 const AddSongModal = ({
-  formData,
   closeModal,
-  setFormData,
-  handleSaveImportSong,
+  afterSave,
 }: {
-  formData: SongProps;
   closeModal: () => void;
-  setFormData: React.Dispatch<React.SetStateAction<SongProps>>;
-  handleSaveImportSong: () => void;
+  afterSave: () => void;
 }) => {
+  const [formData, setFormData] = useState<SongUploadProps>({
+    title: "",
+    artist: "",
+    posterFile: null,
+    sourceFile: null,
+  });
+
+  const handleSave = async () => {
+    //Append token to request
+    const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("artist", formData.artist);
+    if (formData.posterFile) {
+      data.append("posterFile", formData.posterFile);
+    }
+    if (formData.sourceFile) {
+      data.append("sourceFile", formData.sourceFile);
+    }
+    console.log("Data before fetch", data);
+    try {
+      const response = await fetch("http://localhost:4000/api/songs", {
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(response);
+
+      afterSave();
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-10 overflow-y-auto"
@@ -59,19 +99,29 @@ const AddSongModal = ({
                       setFormData({ ...formData, artist: e.target.value })
                     }
                   />
-                  <FormField
-                    label="Source"
-                    value={formData.source}
+
+                  <UploadFormField
+                    label="Poster"
+                    value={formData.posterFile || undefined}
+                    fileType={["image/*"]}
+                    uploadDescription="File accepted: jpg, jpeg, png"
                     onChange={(e) =>
-                      setFormData({ ...formData, source: e.target.value })
+                      setFormData({
+                        ...formData,
+                        posterFile: e.target.files?.[0],
+                      })
                     }
                   />
-
-                  <FormField
-                    label="Poster"
-                    value={formData.poster}
+                  <UploadFormField
+                    label="Source"
+                    value={formData.sourceFile || undefined}
+                    fileType={["audio/*"]}
+                    uploadDescription="File accepted: mp3"
                     onChange={(e) =>
-                      setFormData({ ...formData, poster: e.target.value })
+                      setFormData({
+                        ...formData,
+                        sourceFile: e.target.files?.[0],
+                      })
                     }
                   />
                 </div>
@@ -82,7 +132,7 @@ const AddSongModal = ({
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="button"
-              onClick={handleSaveImportSong}
+              onClick={handleSave}
               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Save
@@ -102,3 +152,83 @@ const AddSongModal = ({
 };
 
 export default AddSongModal;
+
+const UploadFormField = ({
+  label,
+  fileType,
+  value,
+  onChange,
+  uploadDescription,
+}: {
+  label: string;
+  value: File | null | undefined;
+  fileType: string[];
+  uploadDescription: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) => {
+  return (
+    <div>
+      <label
+        htmlFor="file-upload"
+        className="block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
+      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+        <div className="space-y-1 text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            stroke="currentColor"
+            fill="none"
+            viewBox="0 0 48 48"
+            aria-hidden="true"
+          >
+            <path
+              d="M24 14v10m0 0v10m0-10h10m-10 0H14"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <div className="flex text-sm text-gray-600">
+            <label
+              htmlFor={`file-upload-${label}`}
+              className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+            >
+              {value ? ( // If value is not empty, show the file name
+                <span className="justify-center text-blue-600 font-medium">
+                  {value.name}
+                </span>
+              ) : (
+                <span>Upload a file</span>
+              )}
+
+              <input
+                id={`file-upload-${label}`}
+                name="file-upload"
+                type="file"
+                accept={fileType.join(",")}
+                className="sr-only"
+                onChange={onChange}
+              />
+            </label>
+            {value ? <></> : <p className="pl-1">or drag and drop</p>}
+          </div>
+          {/* If fileType is image, show the image preview */}
+          {fileType.includes("image/*") && value && (
+            //Center the image
+            <div className="flex justify-center">
+              <img
+                src={URL.createObjectURL(value)}
+                alt="preview"
+                className="h-20 w-20"
+              />
+            </div>
+          )}
+          <p className="text-xs text-gray-500">{uploadDescription}</p>
+          {value && <p className="text-xs text-gray-500">{value.size} bytes</p>}
+        </div>
+      </div>
+    </div>
+  );
+};
