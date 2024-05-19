@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SongTable from "../../Components/Admin/Song/SongTable";
 
 import { SongProps } from "../../Type/type";
 import EditSongModal from "../../Components/Admin/Song/EditSongModal";
 import AddSongModal from "../../Components/Admin/Song/AddSongModal";
-
+import axios from "axios";
+export interface AdminSongItem {
+  id: number;
+  title: string;
+  artist: string;
+  source: string;
+  poster: string;
+  listenCount?: number;
+  tags?: string[];
+}
 export default function Songs() {
   const [isModalAddSongOpen, setIsModalAddSongOpen] = useState(false);
-
   const [isModalEditSongOpen, setIsModalEditSongOpen] = useState(false);
-
+  const [data, setData] = useState<AdminSongItem[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongProps | null>(null);
   const [formData, setFormData] = useState<SongProps>({
     id: 0,
@@ -18,89 +26,99 @@ export default function Songs() {
     source: "",
     poster: "",
   });
+  useEffect(() => {
+    // Fetch data from API
+    axios
+      .get<AdminSongItem[]>("http://localhost:4000/api/songs/all", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setData(res.data))
+      .catch((err) => console.log(err));
+  }, []);
+  // const data: AdminSongItem[] = [
+  //   {
+  //     id: 1,
+  //     title: "Shape of You",
 
-  const data: SongProps[] = [
-    {
-      id: 1,
-      title: "Shape of You",
+  //     artist: "Ed Sheeran",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Someone Like You",
 
-      artist: "Ed Sheeran",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 2,
-      title: "Someone Like You",
+  //     artist: "Adele",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Bohemian Rhapsody",
 
-      artist: "Adele",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 3,
-      title: "Bohemian Rhapsody",
+  //     artist: "Freddie Mercury",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Hello",
 
-      artist: "Freddie Mercury",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 4,
-      title: "Hello",
+  //     artist: "Adele",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 5,
+  //     title: "Perfect",
 
-      artist: "Adele",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 5,
-      title: "Perfect",
+  //     artist: "Ed Sheeran",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 6,
+  //     title: "Rolling in the Deep",
 
-      artist: "Ed Sheeran",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 6,
-      title: "Rolling in the Deep",
+  //     artist: "Adele",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 7,
+  //     title: "Thinking Out Loud",
 
-      artist: "Adele",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 7,
-      title: "Thinking Out Loud",
+  //     artist: "Ed Sheeran",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 8,
+  //     title: "Bohemian Rhapsody",
 
-      artist: "Ed Sheeran",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 8,
-      title: "Bohemian Rhapsody",
+  //     artist: "Freddie Mercury",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 9,
+  //     title: "Someone You Loved",
 
-      artist: "Freddie Mercury",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 9,
-      title: "Someone You Loved",
+  //     artist: "Lewis Capaldi",
+  //     source: "",
+  //     poster: "",
+  //   },
+  //   {
+  //     id: 10,
+  //     title: "Happier",
 
-      artist: "Lewis Capaldi",
-      source: "",
-      poster: "",
-    },
-    {
-      id: 10,
-      title: "Happier",
-
-      artist: "Ed Sheeran",
-      source: "",
-      poster: "",
-    },
-  ];
+  //     artist: "Ed Sheeran",
+  //     source: "",
+  //     poster: "",
+  //   },
+  // ];
 
   const handleEditSong = (song: SongProps) => {
     setSelectedSong(song);
