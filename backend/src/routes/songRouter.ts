@@ -4,6 +4,7 @@ import {
   createSong,
   getMetadataFromSongId,
   deleteSong,
+  increaseListenCount,
 } from "../controllers/songController";
 
 //middleware
@@ -21,5 +22,6 @@ router.get("/delete/:song_id", checkIsManager, deleteSong);
 router.use(requireAuth);
 router.get("/all", getAllSongs);
 router.get("/:song_id", getMetadataFromSongId);
+router.get("/:song_id/play", increaseListenCount);
 
 export default router;

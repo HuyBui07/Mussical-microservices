@@ -11,8 +11,10 @@ interface SongProps {
   };
   onClick: () => void;
   onClickAdd: () => void;
+  //default true
+  increaseListenCount?: boolean;
 }
-//Used in song discovery/ search results
+//Used in song discovery/ search results. Will automatically increase listen count every time a song is played
 const Song: React.FC<SongProps> = ({ data, onClick, onClickAdd }) => {
   return (
     <a className="group relative">
@@ -21,7 +23,24 @@ const Song: React.FC<SongProps> = ({ data, onClick, onClickAdd }) => {
       </div>
       <div
         className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7"
-        onClick={onClick}
+        //Call api to increase listen count then onClick
+        onClick={async () => {
+          const repsonse = await fetch(
+            `http://localhost:4000/api/songs/${data._id}/play`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (repsonse.ok) {
+            console.log("Successfully increased listen count");
+          } else {
+            console.error("Failed to increase listen count");
+          }
+          if (onClick) onClick();
+        }}
       >
         <img
           src={data.poster}
