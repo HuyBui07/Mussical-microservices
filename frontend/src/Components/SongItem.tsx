@@ -4,12 +4,14 @@ import { useState } from "react";
 import axios from "axios";
 import ConfirmPopup from "./UtilComponents/ConfirmPopup";
 import RemoveButton from "./UtilComponents/RemoveButton";
+
 interface SongItemProps {
   songId: number;
   onClick: (song: SongData) => void;
   playListId: string;
   onRemove: () => void;
 }
+
 // Used in Playlist tab to display songs from a playlist
 const SongItem: React.FC<SongItemProps> = ({
   songId,
@@ -17,15 +19,10 @@ const SongItem: React.FC<SongItemProps> = ({
   playListId,
   onRemove,
 }) => {
-  const [song, setSong] = useState<SongData>({
-    _id: 0,
-    title: "",
-    artist: "",
-    poster: "",
-    source: "",
-  });
+  const [song, setSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [length, setLength] = useState<string>("");
+
   useEffect(() => {
     console.log("Playlist ID: ", playListId);
     // Fetch song data
@@ -37,20 +34,33 @@ const SongItem: React.FC<SongItemProps> = ({
             Authorization: `Bearer ${token}`,
           },
         })
-        .then((res) => setSong(res.data))
-        .catch((err) => console.log("Error fetching song: ", err));
+        .then((res) => {
+          if (!res.data) {
+            // To handle if admin randomly deletes a song from the database
+            removeFromPlaylist();
+            return;
+          }
+          setSong(res.data);
+          const audio = new Audio(res.data.source);
+          audio.addEventListener("loadedmetadata", () => {
+            const minutes = Math.floor(audio.duration / 60);
+            const seconds = Math.floor(audio.duration - minutes * 60);
+            if (seconds < 10) {
+              setLength(`${minutes}:0${seconds}`);
+            } else {
+              setLength(`${minutes}:${seconds}`);
+            }
+          });
+        })
+        .catch((err) => {
+          console.log("Error fetching song: ", err);
+          if (err.response && err.response.status === 404) {
+            removeFromPlaylist();
+          }
+        });
     }
-    const audio = new Audio(song.source);
-    audio.addEventListener("loadedmetadata", () => {
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration - minutes * 60);
-      if (seconds < 10) {
-        setLength(`${minutes}:0${seconds}`);
-        return;
-      }
-      setLength(`${minutes}:${seconds}`);
-    });
   }, []);
+
   const removeFromPlaylist = () => {
     const token = localStorage.getItem("token");
 
@@ -76,6 +86,7 @@ const SongItem: React.FC<SongItemProps> = ({
         });
     }
   };
+
   const handleRemoveClick = () => {
     setShowPopup(true);
   };
@@ -88,9 +99,10 @@ const SongItem: React.FC<SongItemProps> = ({
   const handleCancelRemove = () => {
     setShowPopup(false);
   };
+
   return (
     <>
-      {song._id !== 0 ? (
+      {song ? (
         <div className="flex flex-row justify-between items-center song-item hover:bg-gray-700 cursor-pointer p-2 rounded-lg my-2 bg-gray-800">
           <div
             className="flex flex-row items-center space-x-4 flex-grow justify-between mr-4"
