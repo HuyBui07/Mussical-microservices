@@ -1,7 +1,14 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
-export default function SearchBar(): JSX.Element {
+export default function SearchBar({
+  invisible = false,
+}: {
+  invisible?: boolean;
+}): JSX.Element {
   return (
-    <form className="ml-6 mt-4 flex items-center max-w-sm mx-auto w-[500px]">
+    <form
+      className={`ml-6 mt-4 flex items-center max-w-sm mx-auto w-[500px] ${invisible ? 'invisible' : ''}`}
+      hidden={invisible}
+    >
       <label htmlFor="simple-search" className="sr-only text-white">
         Search
       </label>

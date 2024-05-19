@@ -5,6 +5,7 @@ import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/16/solid";
 import Song from "../../Components/Song";
 import axios from "axios";
 import AddToPlaylistPopup from "../../Components/UtilComponents/AddToPlaylistPopup";
+import SearchBar from "../../Components/SearchBar";
 
 export default function Explore() {
   const [songs, setSongs] = useState<SongData[]>([]);
@@ -43,7 +44,9 @@ export default function Explore() {
         className="m-2 mb-8 ml-4 bg-zinc-800 h-full "
         style={{ borderRadius: "10px" }}
       >
-        <NavBar />
+        <div className="flex mt-2">
+          <SearchBar />
+        </div>
 
         <div className="my-[14px] mx-3 bg-gray-600 h-[1px]" />
 

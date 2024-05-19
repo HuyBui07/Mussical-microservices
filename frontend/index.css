@@ -16,3 +16,8 @@
 body {
   overflow: hidden;
 }
+
+.invisible {
+  visibility: hidden;
+  pointer-events: none;
+}
