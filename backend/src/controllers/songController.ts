@@ -64,6 +64,11 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
 
   try {
     const song = await Song.findById(song_id);
+    if (!song) {
+      return res.status(404).json({ message: "Song not found" });
+    }
+    //If found , increase song listen count
+    await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
     res.status(200).json(song);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
