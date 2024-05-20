@@ -49,7 +49,6 @@ const createSong = async (req: Request, res: Response) => {
 const getAllSongs = async (req: Request, res: Response) => {
   const title = (req.query.title as string) || "";
   const { page, limit } = (req as PaginatedRequest).pagination;
-  console.log("page", page, "limit", limit);
   try {
     const songs = await Song.find({
       title: { $regex: title, $options: "i" },
@@ -115,8 +114,27 @@ const deleteSong = async (req: Request, res: Response) => {
           cloudinaryClient.uploader.destroy(publicIdPoster),
           cloudinaryClient.uploader.destroy(publicIdSource),
         ]);
+        console.log("Deleted poster and source from cloudinary");
       }
     }
+    console.log("Deleted song", song);
+    res.status(200).json(song);
+  } catch (err: any) {
+    console.log("Delete song error", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateSong = async (req: Request, res: Response) => {
+  const { song_id } = req.params;
+  //allowed update : title, artist, source, poster
+  const { title, artist, source, poster } = req.body;
+  try {
+    const song = await Song.findByIdAndUpdate(
+      song_id,
+      { title, artist, source, poster },
+      { new: true }
+    );
     res.status(200).json(song);
   } catch (err: any) {
     res.status(500).json({ message: err.message });

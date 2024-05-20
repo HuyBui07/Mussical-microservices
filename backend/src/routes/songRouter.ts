@@ -5,6 +5,7 @@ import {
   getMetadataFromSongId,
   deleteSong,
   increaseListenCount,
+  updateSong,
 } from "../controllers/songController";
 
 //middleware
@@ -16,8 +17,8 @@ const router = express.Router();
 //For managers
 //Exclude use requierAuth on createSong. checkIsManager is enough
 router.post("/", checkIsManager, multerSongUploader, createSong);
-router.get("/delete/:song_id", checkIsManager, deleteSong);
-
+router.put("/:song_id", checkIsManager, updateSong);
+router.delete("/:song_id", checkIsManager, deleteSong);
 //For normal users
 router.use(requireAuth);
 router.get("/all", assignPagination, getAllSongs);
