@@ -1,5 +1,5 @@
 export interface SongProps {
-  id: number;
+  _id: number;
   title: string;
   artist: string;
   source: string;

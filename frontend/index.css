@@ -21,3 +21,12 @@ body {
   visibility: hidden;
   pointer-events: none;
 }
+.chevron-icon {
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.chevron-icon:hover {
+  transform: scale(1.2);
+  color: #f70303;
+}
