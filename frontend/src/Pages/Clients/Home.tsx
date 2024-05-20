@@ -27,6 +27,9 @@ export default function Home() {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        params: {
+          limit: 4,
+        },
       })
       .then((res) => setSongs(res.data))
       .catch((err) => console.log(err));
@@ -62,7 +65,9 @@ export default function Home() {
         <div className="mt-[14px] h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-lg text-white my-4 font-bold">Recent Songs</h2>
+              <h2 className="text-lg text-white my-4 font-bold">
+                Recent Songs
+              </h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
@@ -84,7 +89,9 @@ export default function Home() {
           </div>
           <div className="mt-[14px] mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-lg text-white my-4 font-bold">Top Picks For You</h2>
+              <h2 className="text-lg text-white my-4 font-bold">
+                Top Picks For You
+              </h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
