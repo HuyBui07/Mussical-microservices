@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import cloudinaryClient, { cloudinaryUploader } from "../cloudinary";
 //model
 import Song from "../models/songModel";
+import { PaginatedRequest } from "../middlewares/pagination";
 
 //create a new song
 const createSong = async (req: Request, res: Response) => {
@@ -46,12 +47,22 @@ const createSong = async (req: Request, res: Response) => {
 
 //get all songs for the main screen ()
 const getAllSongs = async (req: Request, res: Response) => {
-  const title = req.query.title as string;
-
+  const title = (req.query.title as string) || "";
+  const { page, limit } = (req as PaginatedRequest).pagination;
+  console.log("page", page, "limit", limit);
   try {
     const songs = await Song.find({
-      title: { $regex: new RegExp(title), $options: "i" },
-    });
+      title: { $regex: title, $options: "i" },
+    })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
+    //total count to attach to header
+    const totalCount = await Song.countDocuments({
+      title: { $regex: title, $options: "i" },
+    }).exec();
+
+    res.setHeader("X-Total-Count", totalCount.toString());
     res.status(200).json(songs);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
