@@ -12,17 +12,6 @@ export default function Explore() {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
 
-  // useEffect(() => {
-  //   axios
-  //     .get<SongData[]>("http://localhost:4000/api/songs/all", {
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       },
-  //     })
-  //     .then((res) => setSearchedSongs(res.data))
-  //     .catch((err) => console.log(err));
-  // }, []);
-
   const handleSongClick = (song: SongData) => {
     setSelectedSong(song);
   };
@@ -44,7 +33,7 @@ export default function Explore() {
         style={{ borderRadius: "10px" }}
       >
         <div className="flex mt-2">
-          <SearchBar setSearchedSongs={setSearchedSongs}/>
+          <SearchBar setSearchedSongs={setSearchedSongs} />
         </div>
 
         <div className="my-[14px] mx-3 bg-gray-600 h-[1px]" />
@@ -62,27 +51,6 @@ export default function Explore() {
               ))}
             </div>
           </div>
-
-          {/* <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
-            <div className="flex flex-row justify-between">
-              <h2 className="text-md text-white my-4">Recommended</h2>
-              <div className="flex flex-row">
-                <ChevronLeftIcon className="w-6" />
-                <ChevronRightIcon className="w-6" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {searchedSongs.map((song) => (
-                <Song
-                  key={song._id}
-                  data={song}
-                  onClick={() => handleSongClick(song)}
-                  onClickAdd={() => handleAddToPlaylistPopup(song)}
-                />
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
 
