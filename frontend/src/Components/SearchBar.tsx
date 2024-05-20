@@ -22,7 +22,7 @@ export default function SearchBar({
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        params: { title: searchText },
+        params: { title: searchText, limit: 8 },
       })
       .then((res) => {
         setSearchedSongs(res.data);
