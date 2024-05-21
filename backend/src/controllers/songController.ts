@@ -95,20 +95,7 @@ const increaseListenCount = async (req: AuthRequest, res: Response) => {
   const user_id = req.user?._id;
   try {
     await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
-    //Find latest record with the same user and song
-    const latestRecord = await HistoryRecord.findOne({
-      userId: user_id,
-      songId: song_id,
-    }).sort({ dateListened: -1 });
-    //Create history record if the latest record is more than 10 seconds ago
-    if (latestRecord) {
-      const lastListened = latestRecord.dateListened.getTime();
-      const currentTime = new Date().getTime();
-      const diff = currentTime - lastListened;
-      if (diff < defaultDelay) {
-        return res.status(200).json({ message: "Listen count increased" });
-      }
-    }
+
     const newRecord = new HistoryRecord({
       userId: user_id,
       songId: song_id,
@@ -205,7 +192,6 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
       }
     });
     //Return top 5 tags of the month and divide using percentage, then have one other field for the rest
-
     const topTags = await HistoryRecord.aggregate([
       {
         $match: {
@@ -243,12 +229,21 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
       },
     ]);
     //Modify to include other using percentage
-    const topTagsResult = topTags.map((tag) => {
-      return {
-        tag: tag._id,
-        count: tag.count,
-      };
+    const totalTagCount = await HistoryRecord.countDocuments({
+      dateListened: {
+        $gte: firstWeekStart,
+        $lt: nextMonthStart,
+      },
     });
+
+    const topTagsResult = topTags.map((tag) => ({
+      tag: tag._id,
+      percentage: (tag.count / totalTagCount) * 100,
+    }));
+
+    const otherPercentage =
+      100 - topTagsResult.reduce((acc, tag) => acc + tag.percentage, 0);
+    topTagsResult.push({ tag: "Other", percentage: otherPercentage });
 
     const topSongs = await HistoryRecord.aggregate([
       {
