@@ -6,6 +6,8 @@ import {
   deleteSong,
   increaseListenCount,
   updateSong,
+  getThisMonthStats,
+  injectionTest,
 } from "../controllers/songController";
 
 //middleware
@@ -17,10 +19,14 @@ const router = express.Router();
 //For managers
 //Exclude use requierAuth on createSong. checkIsManager is enough
 router.post("/", checkIsManager, multerSongUploader, createSong);
+router.get("/stats", checkIsManager, getThisMonthStats);
+router.get("/stats/injection", checkIsManager, injectionTest);
 router.put("/:song_id", checkIsManager, updateSong);
 router.delete("/:song_id", checkIsManager, deleteSong);
+
 //For normal users
 router.use(requireAuth);
+
 router.get("/all", assignPagination, getAllSongs);
 router.get("/:song_id", getMetadataFromSongId);
 router.get("/:song_id/play", increaseListenCount);

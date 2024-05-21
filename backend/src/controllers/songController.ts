@@ -5,7 +5,9 @@ import cloudinaryClient, { cloudinaryUploader } from "../cloudinary";
 //model
 import Song from "../models/songModel";
 import { PaginatedRequest } from "../middlewares/pagination";
-
+import HistoryRecord from "../models/historyRecord";
+import { AuthRequest } from "../middlewares/requireAuth";
+import User from "../models/userModel";
 //create a new song
 const createSong = async (req: Request, res: Response) => {
   if (
@@ -85,12 +87,35 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
   }
 };
 
-//increase listen count of a song
-const increaseListenCount = async (req: Request, res: Response) => {
+//increase listen count of a song and create a history record
+const increaseListenCount = async (req: AuthRequest, res: Response) => {
   const { song_id } = req.params;
-
+  const defaultDelay = 10000; //10 seconds
+  //get user id , then create history record
+  const user_id = req.user?._id;
   try {
     await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
+    //Find latest record with the same user and song
+    const latestRecord = await HistoryRecord.findOne({
+      userId: user_id,
+      songId: song_id,
+    }).sort({ dateListened: -1 });
+    //Create history record if the latest record is more than 10 seconds ago
+    if (latestRecord) {
+      const lastListened = latestRecord.dateListened.getTime();
+      const currentTime = new Date().getTime();
+      const diff = currentTime - lastListened;
+      if (diff < defaultDelay) {
+        return res.status(200).json({ message: "Listen count increased" });
+      }
+    }
+    const newRecord = new HistoryRecord({
+      userId: user_id,
+      songId: song_id,
+      dateListened: new Date(),
+    });
+    await newRecord.save();
+    console.log("History record created: ", newRecord);
     res.status(200).json({ message: "Listen count increased" });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -139,6 +164,180 @@ export const updateSong = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
+};
+//Return each week listening count total of the month using history record
+//Return top 5 tags of the month using history record
+//Return top 3 songs of this month using history record
+export const getThisMonthStats = async (req: Request, res: Response) => {
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const firstWeekStart = new Date(currentYear, currentMonth, 2);
+  const nextMonthStart = new Date(currentYear, currentMonth + 1, 2);
+  console.log("First week start: ", firstWeekStart);
+  console.log("Next month start: ", nextMonthStart);
+  console.log("Querying this month stats");
+
+  try {
+    const totalListenCount = await HistoryRecord.aggregate([
+      {
+        $match: {
+          dateListened: {
+            $gte: firstWeekStart,
+            $lt: nextMonthStart,
+          },
+        },
+      },
+    ]);
+    //Fill into 4 weeks (1-7, 8-14, 15-21, 22- end of month)
+    const totalListenCountResult = Array(4).fill(0);
+    totalListenCount.forEach((record) => {
+      const dateListened = record.dateListened;
+      const date = dateListened.getDate();
+      if (date <= 7) {
+        totalListenCountResult[0]++;
+      } else if (date <= 14) {
+        totalListenCountResult[1]++;
+      } else if (date <= 21) {
+        totalListenCountResult[2]++;
+      } else {
+        totalListenCountResult[3]++;
+      }
+    });
+    //Return top 5 tags of the month and divide using percentage, then have one other field for the rest
+
+    const topTags = await HistoryRecord.aggregate([
+      {
+        $match: {
+          dateListened: {
+            $gte: firstWeekStart,
+            $lt: nextMonthStart,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "songs",
+          localField: "songId",
+          foreignField: "_id",
+          as: "song",
+        },
+      },
+      {
+        $unwind: "$song",
+      },
+      {
+        $unwind: "$song.tags",
+      },
+      {
+        $group: {
+          _id: "$song.tags",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 5,
+      },
+    ]);
+    //Modify to include other using percentage
+    const topTagsResult = topTags.map((tag) => {
+      return {
+        tag: tag._id,
+        count: tag.count,
+      };
+    });
+
+    const topSongs = await HistoryRecord.aggregate([
+      {
+        $match: {
+          dateListened: {
+            $gte: firstWeekStart,
+            $lt: nextMonthStart,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$songId",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 3,
+      },
+    ]);
+
+    const topSongsResult = await Promise.all(
+      topSongs.map(async (song) => {
+        const songInfo = await Song.findById(song._id);
+        return {
+          song: songInfo,
+          count: song.count,
+        };
+      })
+    );
+
+    res.status(200).json({
+      totalListenCount: totalListenCountResult,
+      topTags: topTagsResult,
+      topSongs: topSongsResult,
+    });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const injectionTest = async (req: Request, res: Response) => {
+  // Set all song listen count to 0
+  // For each song, find a random user, create a history record with date ranging from the beginning of the current month to now
+  // Total 100 records
+  const songs = await Song.find().exec();
+  const users = await User.find().exec();
+  const currentDate = new Date();
+
+  // Set oneMonthAgo to the start of the current month
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    //Random hack because of timezone and some weird stuff
+    2
+  );
+  const endOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
+  const timeRange = endOfMonth.getTime() - startOfMonth.getTime();
+
+  // Clear history record
+  await HistoryRecord.deleteMany({}).exec();
+  console.log("Cleared history record");
+  console.log("Start of month: ", startOfMonth);
+  console.log("End of month: ", endOfMonth);
+  console.log("Injection test started");
+
+  for (let i = 0; i < 1000; i++) {
+    const randomSong = songs[Math.floor(Math.random() * songs.length)];
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    const randomDate = new Date(
+      startOfMonth.getTime() + Math.random() * timeRange
+    );
+    const newRecord = new HistoryRecord({
+      userId: randomUser._id,
+      songId: randomSong._id,
+      dateListened: randomDate,
+    });
+    await newRecord.save();
+  }
+
+  console.log("Injection test finished!");
+  res.status(200).json({ message: "Injection test finished" });
 };
 
 export {
