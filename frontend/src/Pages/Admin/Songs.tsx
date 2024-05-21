@@ -22,11 +22,6 @@ export default function Songs() {
     setSelectedSong(song);
     setIsModalEditSongOpen(true);
   };
-  // const afterChange = () => {
-  //   // Add logic to save edited data
-  //   setIsModalEditSongOpen(false);
-  //   setSelectedSong(null);
-  // };
 
   const closeModal = async () => {
     setIsModalEditSongOpen(false);

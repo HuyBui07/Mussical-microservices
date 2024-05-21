@@ -14,7 +14,7 @@ const User = () => {
       id: 2,
       name: "Bùi Gia Huy",
       email: "huy.bui@example.com",
-      role: "client",
+      role: "admin",
       status: "Unknown",
     },
     {
