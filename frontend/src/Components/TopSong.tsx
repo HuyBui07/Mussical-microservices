@@ -1,13 +1,12 @@
 import React from "react";
-
-interface SongData {
-  _id: number;
-  title: string;
-  poster: string;
-}
+import { SongStat } from "../Pages/Admin/Statistics"; // interface SongData {
+//   _id: number;
+//   title: string;
+//   poster: string;
+// }
 
 interface SongProps {
-  data: SongData;
+  data: SongStat;
   rank: number;
 }
 
@@ -17,13 +16,13 @@ const TopSong: React.FC<SongProps> = ({ data, rank }) => {
       <p className="text-xl font-bold mr-4">{rank}</p>
       {/* Đặt margin-right cho phần rank */}
       <img
-        src={data.poster}
-        alt={data.title}
+        src={data.song.poster}
+        alt={data.song.title}
         className="h-48 w-48 object-cover"
       />
       <div>
-        <p className="ml-4">{data.title}</p>
-        <p className="ml-4">178,233 monthly listeners</p>
+        <p className="ml-4">{data.song.title}</p>
+        <p className="ml-4">{data.count} listens</p>
       </div>
     </div>
   );
