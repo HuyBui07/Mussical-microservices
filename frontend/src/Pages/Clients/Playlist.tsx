@@ -128,7 +128,7 @@ const Playlist: React.FC = () => {
         className="mx-2 mt-[-25px] ml-4 bg-zinc-800 h-[17%]"
         style={{ borderRadius: "10px" }}
       >
-        <MusicPlayer selectedSong={selectedSong} />
+        <MusicPlayer selectedSong={selectedSong} onSongEnd={() => {}} />
       </div>
     </>
   );
