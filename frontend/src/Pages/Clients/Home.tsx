@@ -13,6 +13,7 @@ import MusicPlayer from "../../Components/MusicPlayer";
 import axios from "axios";
 import AddToPlaylistPopup from "../../Components/UtilComponents/AddToPlaylistPopup";
 import SearchBar from "../../Components/SearchBar";
+import LoadingCircle from "../../Components/UtilComponents/LoadingCircle";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ export default function Home() {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
   const email = useSelector((state: any) => state.user.email);
+
+  // Loading circle state
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     axios
       .get<SongData[]>("http://localhost:4000/api/songs/all", {
@@ -29,6 +34,7 @@ export default function Home() {
         },
       })
       .then((res) => setSongs(res.data))
+      .then(() => setLoading(false))
       .catch((err) => console.log(err));
   }, []);
 
@@ -62,47 +68,59 @@ export default function Home() {
         <div className="mt-[14px] h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-lg text-white my-4 font-bold">Recent Songs</h2>
+              <h2 className="text-lg text-white my-4 font-bold">
+                Recent Songs
+              </h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {songs.map((song) => (
-                <Song
-                  key={song._id}
-                  data={song}
-                  onClick={() => handleSongClick(song)}
-                  onClickAdd={() => {
-                    setCurrentAddSong(song);
-                    handleAddToPlaylistPopup();
-                  }}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <LoadingCircle color="white" />
+            ) : (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                {songs.map((song) => (
+                  <Song
+                    key={song._id}
+                    data={song}
+                    onClick={() => handleSongClick(song)}
+                    onClickAdd={() => {
+                      setCurrentAddSong(song);
+                      handleAddToPlaylistPopup();
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
           <div className="mt-[14px] mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-lg text-white my-4 font-bold">Top Picks For You</h2>
+              <h2 className="text-lg text-white my-4 font-bold">
+                Top Picks For You
+              </h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon className="w-6" />
                 <ChevronRightIcon className="w-6" />
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {songs.map((song) => (
-                <Song
-                  key={song._id}
-                  data={song}
-                  onClick={() => handleSongClick(song)}
-                  onClickAdd={() => {
-                    setCurrentAddSong(song);
-                    handleAddToPlaylistPopup();
-                  }}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <LoadingCircle color="white" />
+            ) : (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                {songs.map((song) => (
+                  <Song
+                    key={song._id}
+                    data={song}
+                    onClick={() => handleSongClick(song)}
+                    onClickAdd={() => {
+                      setCurrentAddSong(song);
+                      handleAddToPlaylistPopup();
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
