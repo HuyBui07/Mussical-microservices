@@ -25,6 +25,12 @@ HistoryRecordSchema.post("deleteMany", async function (doc: HistoryRecord) {
   console.log("Removing history record from user", doc.userId);
   await User.updateOne({ _id: doc.userId }, { $pull: { history: doc._id } });
 });
+//Delete the history record id from user model after being deleted
+HistoryRecordSchema.post("deleteOne", async function (doc: HistoryRecord) {
+  const User = mongoose.model("User");
+  console.log("Removing history record from user", doc.userId);
+  await User.updateOne({ _id: doc.userId }, { $pull: { history: doc._id } });
+});
 export default mongoose.model<HistoryRecord>(
   "HistoryRecord",
   HistoryRecordSchema
