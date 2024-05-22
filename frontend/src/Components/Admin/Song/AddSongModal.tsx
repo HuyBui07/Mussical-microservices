@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormField from "../../UtilComponents/FormField";
 
 export interface SongUploadProps {
   title: string;
   artist: string;
+  tags?: string[];
   posterFile: File | undefined | null;
   sourceFile: File | undefined | null;
 }
@@ -20,6 +21,7 @@ const AddSongModal = ({
     artist: "",
     posterFile: null,
     sourceFile: null,
+    tags: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -35,6 +37,11 @@ const AddSongModal = ({
     }
     if (formData.sourceFile) {
       data.append("sourceFile", formData.sourceFile);
+    }
+    //tags is split using space
+    const tags = formData.tags?.join(" ");
+    if (tags) {
+      data.append("tags", tags);
     }
     console.log("Data before fetch", data);
     try {
@@ -125,6 +132,18 @@ const AddSongModal = ({
                         sourceFile: e.target.files?.[0],
                       })
                     }
+                  />
+                  <TagField
+                    label="Tag"
+                    tags={["Pop", "Rock", "Jazz", "Hip-hop", "Other"]}
+                    value={formData.tags?.[0] || ""}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setFormData({
+                        ...formData,
+                        tags: [e.target.value],
+                      });
+                    }}
                   />
                 </div>
               </div>
@@ -262,6 +281,71 @@ const UploadFormField = ({
           {value && <p className="text-xs text-gray-500">{value.size} bytes</p>}
         </div>
       </div>
+    </div>
+  );
+};
+
+//Will load tags available from the API, allow user to choose from available tags, if user choose "other", then show a input field for user to input new tag
+
+const TagField = ({
+  label,
+  tags,
+  value,
+  onChange,
+}: {
+  label: string;
+  tags: string[];
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+}) => {
+  const [currenTag, setCurrentTag] = useState<string>(value);
+  const [newTag, setNewTag] = useState<string>("");
+
+  useEffect(() => {
+    if (newTag !== "") {
+      onChange({
+        target: { value: newTag },
+      } as unknown as React.ChangeEvent<HTMLSelectElement>);
+    }
+  }, [newTag]);
+  return (
+    <div>
+      <label
+        htmlFor="tag-select"
+        className="block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
+      <select
+        id="tag-select"
+        name="tag-select"
+        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md text-white bg-gray-800"
+        value={currenTag}
+        onChange={(e) => {
+          if (e.target.value === "Other") {
+            setNewTag("");
+            setCurrentTag("Other");
+          } else {
+            setCurrentTag(e.target.value);
+            onChange(e);
+          }
+        }}
+      >
+        {tags.map((tag) => (
+          <option key={tag} value={tag}>
+            {tag}
+          </option>
+        ))}
+      </select>
+      {currenTag === "Other" ? (
+        <FormField
+          label="New Tag"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
