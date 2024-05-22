@@ -80,7 +80,7 @@ export const getRecentSongs = async (req: Request, res: Response) => {
   try {
     // Retrieve songs sorted by createdAt in descending order
     const songs = await Song.find({})
-      .sort({ dateCreated: 1 })
+      .sort({ dateCreated: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
