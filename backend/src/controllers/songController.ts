@@ -166,12 +166,15 @@ export const getTags = async (req: Request, res: Response) => {
 
 export const updateSong = async (req: Request, res: Response) => {
   const { song_id } = req.params;
-  //allowed update : title, artist, source, poster
+  //allowed update : title, artist, source, poster, tags (array of string, can be empty)
+  //todo: currently if a song has multi tag and we update, it will replace all tags with new tags
   const { title, artist, source, poster } = req.body;
+  const { tags } = req.body;
+
   try {
     const song = await Song.findByIdAndUpdate(
       song_id,
-      { title, artist, source, poster },
+      { title, artist, source, poster, tags },
       { new: true }
     );
     res.status(200).json(song);
