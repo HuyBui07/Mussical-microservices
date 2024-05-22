@@ -16,38 +16,62 @@ import "../../../index.css";
 const limit = 4;
 export default function Home() {
   const navigate = useNavigate();
-  const [songs, setSongs] = useState<SongData[]>([]);
+  const [recentSongs, setRecentSongs] = useState<SongData[]>([]);
+  const [forYouSongs, setForYouSongs] = useState<SongData[]>([]);
+  const [recentPage, setRecentPage] = useState<number>(1);
+  const [totalRecentPage, setTotalRecentPage] = useState<number>(1);
+  const [forYouPage, setForYouPage] = useState<number>(1);
+  const [totalForYouPage, setTotalForYouPage] = useState<number>(1);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [forYouLoading, setForYouLoading] = useState(true);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
-  const [page, setPage] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(1);
+
   const email = useSelector((state: any) => state.user.email);
   const [loadingNewSong, setLoadingNewSong] = useState(false);
-  // Loading circle state
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    setRecentLoading(true);
     axios
-      .get<SongData[]>("http://localhost:4000/api/songs/all", {
+      .get<SongData[]>("http://localhost:4000/api/songs/recent", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         params: {
-          page,
-          limit: 4,
+          page: recentPage,
+          limit: limit,
         },
       })
       .then((res) => {
-        setSongs(res.data);
-        setTotalPage(res.headers["x-total-count"] / limit);
-        setLoading(false);
+        setRecentSongs(res.data);
+        setTotalRecentPage(Math.ceil(res.headers["x-total-count"] / limit));
+        setRecentLoading(false);
       })
       .catch((err) => console.log(err));
-  }, [page]);
+  }, [recentPage]);
+
+  useEffect(() => {
+    setForYouLoading(true);
+    axios
+      .get<SongData[]>("http://localhost:4000/api/songs/for-you", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          page: forYouPage,
+          limit: limit,
+        },
+      })
+      .then((res) => {
+        setForYouSongs(res.data);
+        setTotalForYouPage(Math.ceil(res.headers["x-total-count"] / limit));
+        setForYouLoading(false);
+      })
+      .catch((err) => console.log(err));
+  }, [forYouPage]);
+
   const onSongFinished = async (id: number) => {
-    // Call recommendation API
     setLoadingNewSong(true);
     console.log("Song Finished");
     console.log("Calling recommendation API for id: " + id);
@@ -63,16 +87,20 @@ export default function Home() {
     setLoadingNewSong(false);
     console.log("Recommendation API response: ", res.data);
   };
+
   const handleSongClick = (song: SongData) => {
     setSelectedSong(song);
   };
+
   const handleAddToPlaylistPopup = () => {
     setShowPopup(true);
   };
+
   const handleCancelAddToPlaylist = () => {
     setCurrentAddSong(null);
     setShowPopup(false);
   };
+
   return (
     <>
       <div
@@ -113,23 +141,24 @@ export default function Home() {
                   color="white"
                   className="w-6 chevron-icon"
                   onClick={() => {
-                    page > 1 && setPage(page - 1);
+                    recentPage > 1 && setRecentPage(recentPage - 1);
                   }}
                 />
                 <ChevronRightIcon
                   color="white"
                   className="w-6 chevron-icon"
                   onClick={() => {
-                    page < totalPage && setPage(page + 1);
+                    recentPage < totalRecentPage &&
+                      setRecentPage(recentPage + 1);
                   }}
                 />
               </div>
             </div>
-            {loading ? (
+            {recentLoading ? (
               <LoadingCircle color="white" />
             ) : (
               <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-                {songs.map((song) => (
+                {recentSongs.map((song) => (
                   <Song
                     key={song._id}
                     data={song}
@@ -149,15 +178,28 @@ export default function Home() {
                 Top Picks For You
               </h2>
               <div className="flex flex-row">
-                <ChevronLeftIcon className="w-6 chevron-icon" />
-                <ChevronRightIcon className="w-6 chevron-icon" />
+                <ChevronLeftIcon
+                  color="white"
+                  className="w-6 chevron-icon"
+                  onClick={() => {
+                    forYouPage > 1 && setForYouPage(forYouPage - 1);
+                  }}
+                />
+                <ChevronRightIcon
+                  color="white"
+                  className="w-6 chevron-icon"
+                  onClick={() => {
+                    forYouPage < totalForYouPage &&
+                      setForYouPage(forYouPage + 1);
+                  }}
+                />
               </div>
             </div>
-            {loading ? (
+            {forYouLoading ? (
               <LoadingCircle color="white" />
             ) : (
               <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-                {songs.map((song) => (
+                {forYouSongs.map((song) => (
                   <Song
                     key={song._id}
                     data={song}
