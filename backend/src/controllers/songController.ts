@@ -106,8 +106,7 @@ export const getRecentSongs = async (req: Request, res: Response) => {
   }
 };
 //For you: get user most listened tags. Then get songs with those tags
-// Songs are then ranked by listen count, randomized for each page, ensure that the total count is still the same as the total number of songs
-// throughout the system, to ensure that front end pagination works correctly
+// Put those songs on top, if not enough songs, fill in with other songs
 //If no history available, return popular songs
 export const getForYouSongs = async (req: AuthRequest, res: Response) => {
   const user = req.user;
@@ -133,23 +132,23 @@ export const getForYouSongs = async (req: AuthRequest, res: Response) => {
     const sortedTags = Array.from(tagScore).sort((a, b) => b[1] - a[1]);
     //Get songs with those tags
     const totalCount = await Song.countDocuments({}).exec();
-    //Get songs with tags first, if not enough, get songs without tags
-    const songs = await Song.find({
-      tags: { $in: sortedTags.map((tag) => tag[0]) },
-    })
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec();
-    if (songs.length < limit) {
-      const remainingSongs = await Song.find({
-        tags: { $nin: sortedTags.map((tag) => tag[0]) },
-      })
-        .limit(limit - songs.length)
+    let songs: any[] = [];
+    for (const tag of sortedTags) {
+      const tagSongs = await Song.find({ tags: tag[0] })
+        .limit(limit)
+        .skip((page - 1) * limit)
         .exec();
-      songs.push(...remainingSongs);
+      songs = songs.concat(tagSongs);
+      if (songs.length >= limit) break;
     }
-    //Randomize the order of songs
-    songs.sort(() => Math.random() - 0.5);
+    //If not enough songs, fill in with other songs
+    if (songs.length < limit) {
+      const otherSongs = await Song.find({})
+        .limit(limit - songs.length)
+        .skip((page - 1) * limit)
+        .exec();
+      songs = songs.concat(otherSongs);
+    }
 
     res.setHeader("X-Total-Count", totalCount.toString());
     res.status(200).json(songs);
