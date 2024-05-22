@@ -133,9 +133,7 @@ export default function Home() {
         <div className="mt-[14px] h-[70vh]" style={{ overflow: "auto" }}>
           <div className="mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
-              <h2 className="text-lg text-white my-4 font-bold">
-                Recent Songs
-              </h2>
+              <h2 className="text-lg text-white my-4 font-bold">New songs</h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon
                   color="white"
@@ -175,7 +173,7 @@ export default function Home() {
           <div className="mt-[14px] mx-auto max-w-2xl lg:max-w-7xl lg:px-8">
             <div className="flex flex-row justify-between">
               <h2 className="text-lg text-white my-4 font-bold">
-                Top Picks For You
+                Based on tags you like
               </h2>
               <div className="flex flex-row">
                 <ChevronLeftIcon
