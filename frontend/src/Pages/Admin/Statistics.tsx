@@ -83,18 +83,27 @@ export default function ChartLine() {
     try {
       const adminToken =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
-      const res = await fetch(
-        "http://localhost:4000/api/songs/stats/injection",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${adminToken}`,
-          },
-        }
-      );
+      // const res = await fetch(
+      //   "http://localhost:4000/api/songs/stats/injection",
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${adminToken}`,
+      //     },
+      //   }
+      // );
+
+      // songs/stats/tags
+      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
       const data = await res.json();
-      console.log(data);
+      console.log("Result from injection test", data);
     } catch (error) {
       console.error("Injection test failed", error);
     }
@@ -105,6 +114,7 @@ export default function ChartLine() {
 
   return (
     <>
+      <Button onClick={callInjectionTest}>Test Injection</Button>
       <div className="flex flex-row justify-between gap-2">
         <div
           className="my-2 ml-6 bg-zinc-800 h-[60vh] w-[50%] flex flex-row py-10 px-10"
@@ -216,27 +226,39 @@ export default function ChartLine() {
             }}
             slotProps={{
               legend: {
-                hidden: false,
+                direction: "row",
+                itemGap: 10,
+                position: {
+                  vertical: "middle",
+                  horizontal: "right",
+                },
+                labelStyle: {
+                  fontWeight: 500,
+                  fill: "white",
+                },
               },
             }}
           />
         </div>
       </div>
       <div
-        className="m-2 ml-4 bg-zinc-800 h-[36.5vh] flex flex-row py-10 px-10"
+        className="ml-6 mr-4 bg-zinc-800 h-[36.5vh] flex flex-col py-10 px-10"
         style={{ borderRadius: "10px" }}
       >
-        {!loading ? (
-          topSongs.map((song) => (
-            <TopSong
-              key={song.song._id}
-              data={song}
-              rank={topSongs.indexOf(song) + 1}
-            />
-          ))
-        ) : (
-          <p>Loading...</p>
-        )}
+        <h2 className="text-white font-bold text-2xl">Top songs this month</h2>
+        <div className="flex flex-row gap-2 mt-4">
+          {!loading ? (
+            topSongs.map((song) => (
+              <TopSong
+                key={song.song._id}
+                data={song}
+                rank={topSongs.indexOf(song) + 1}
+              />
+            ))
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
       </div>
     </>
   );
