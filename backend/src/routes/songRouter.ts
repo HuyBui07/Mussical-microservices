@@ -9,6 +9,9 @@ import {
   getThisMonthStats,
   injectionTest,
   getTags,
+  RecommendNextSong,
+  getRecentSongs,
+  getForYouSongs,
 } from "../controllers/songController";
 
 //middleware
@@ -22,15 +25,19 @@ const router = express.Router();
 router.post("/", checkIsManager, multerSongUploader, createSong);
 router.get("/stats", checkIsManager, getThisMonthStats);
 router.get("/stats/injection", checkIsManager, injectionTest);
+router.get("/stats/tags", checkIsManager, getTags);
 router.put("/:song_id", checkIsManager, updateSong);
 router.delete("/:song_id", checkIsManager, deleteSong);
-router.get("/stats/tags", checkIsManager, getTags);
+
 //For normal users
 router.use(requireAuth);
 
 router.get("/all", assignPagination, getAllSongs);
+router.get("/recent", assignPagination, getRecentSongs);
+router.get("/for-you", assignPagination, getForYouSongs);
+router.get("/recommend", RecommendNextSong);
+router.get("/tags", getTags);
 router.get("/:song_id", getMetadataFromSongId);
 router.get("/:song_id/play", increaseListenCount);
-router.get("/tags", getTags);
 
 export default router;
