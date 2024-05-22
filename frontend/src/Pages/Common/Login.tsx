@@ -2,10 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
+//components
+import LoadingScreen from "../../Components/UtilComponents/LoadingScreen";
+
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   //login credentials
@@ -13,6 +17,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const res = await fetch("http://localhost:4000/api/users/login", {
         method: "POST",
@@ -42,12 +47,19 @@ export default function Login() {
     } catch (err: any) {
       console.log(err.message);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
       <div className="bg-white h-screen flex flex-col justify-center px-6 py-12 lg:px-8">
+        {loading && (
+          <div className="fixed inset-0 flex justify-center items-center h-[100vh] w-[100vh]">
+            <LoadingScreen />
+          </div>
+        )}
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-16 w-auto"
