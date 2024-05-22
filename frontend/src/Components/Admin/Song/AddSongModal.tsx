@@ -6,9 +6,16 @@ export interface SongUploadProps {
   artist: string;
   tags?: string[];
   posterFile: File | undefined | null;
+
   sourceFile: File | undefined | null;
 }
-
+export interface ServerTagItem {
+  _id: string; //name of tag
+  count: number; //number of songs with this tag
+}
+export interface ServerTagResponse {
+  tags: ServerTagItem[];
+}
 const AddSongModal = ({
   closeModal,
   afterSave,
@@ -16,6 +23,8 @@ const AddSongModal = ({
   closeModal: () => void;
   afterSave: () => void;
 }) => {
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
   const [formData, setFormData] = useState<SongUploadProps>({
     title: "",
     artist: "",
@@ -24,11 +33,14 @@ const AddSongModal = ({
     tags: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [serverAvailableTags, setServerAvailableTags] =
+    useState<ServerTagResponse>({
+      tags: [],
+    });
+  const [loadingTags, setLoadingTags] = useState<boolean>(true);
   const handleSave = async () => {
     setLoading(true);
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
+
     const data = new FormData();
     data.append("title", formData.title);
     data.append("artist", formData.artist);
@@ -61,7 +73,22 @@ const AddSongModal = ({
     }
     setLoading(false);
   };
-
+  useEffect(() => {
+    const fetchTags = async () => {
+      setLoadingTags(true);
+      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data: ServerTagItem[] = await res.json();
+      setServerAvailableTags({ tags: [...data, { _id: "Other", count: 0 }] });
+      setLoadingTags(false);
+    };
+    fetchTags();
+  }, []);
   return (
     <div
       className="fixed inset-0 z-10 overflow-y-auto"
@@ -133,18 +160,26 @@ const AddSongModal = ({
                       })
                     }
                   />
-                  <TagField
-                    label="Tag"
-                    tags={["Pop", "Rock", "Jazz", "Hip-hop", "Other"]}
-                    value={formData.tags?.[0] || ""}
-                    onChange={(e) => {
-                      console.log(e.target.value);
-                      setFormData({
-                        ...formData,
-                        tags: [e.target.value],
-                      });
-                    }}
-                  />
+                  {loadingTags ? (
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
+                    </div>
+                  ) : (
+                    <TagField
+                      tags={serverAvailableTags.tags.map(
+                        (tag: ServerTagItem) => tag._id
+                      )}
+                      label="Tags of the song"
+                      onChange={(e) => {
+                        console.log(e.target.value);
+                        setFormData({
+                          ...formData,
+                          tags: [e.target.value],
+                        });
+                      }}
+                      value={formData.tags ? formData.tags[0] : ""}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -287,7 +322,7 @@ const UploadFormField = ({
 
 //Will load tags available from the API, allow user to choose from available tags, if user choose "other", then show a input field for user to input new tag
 
-const TagField = ({
+export const TagField = ({
   label,
   tags,
   value,

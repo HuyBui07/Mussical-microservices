@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormField from "../../UtilComponents/FormField";
 
 import { AdminSongItem } from "../../../Pages/Admin/Songs";
+import { ServerTagItem, ServerTagResponse, TagField } from "./AddSongModal";
 
 const EditSongModal = ({
   song,
@@ -20,11 +21,17 @@ const EditSongModal = ({
     artist: song.artist,
     source: song.source,
     poster: song.poster,
+    tags: song.tags || [],
   });
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
   const [saving, setSaving] = useState<boolean>(false);
+  const [serverAvailableTags, setServerAvailableTags] =
+    useState<ServerTagResponse>({
+      tags: [],
+    });
+  const [loadingTags, setLoadingTags] = useState<boolean>(true);
   const handleSaveEdit = async () => {
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
     const res = await fetch(`http://localhost:4000/api/songs/${song._id}`, {
       method: "PUT",
       headers: {
@@ -35,7 +42,25 @@ const EditSongModal = ({
     });
     console.log(res);
   };
-
+  useEffect(() => {
+    const fetchTags = async () => {
+      setLoadingTags(true);
+      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data: ServerTagItem[] = await res.json();
+      setServerAvailableTags({ tags: [...data, { _id: "Other", count: 0 }] });
+      setLoadingTags(false);
+    };
+    fetchTags();
+  }, []);
+  useEffect(() => {
+    console.log("server tags", serverAvailableTags);
+  }, [serverAvailableTags]);
   return (
     <div className="fixed inset-0 z-10 overflow-y-auto bg-opacity-75 bg-gray-700 flex justify-center items-center">
       {/* Modal container */}
@@ -70,6 +95,26 @@ const EditSongModal = ({
                 value={form.poster}
                 onChange={(e) => setForm({ ...song, poster: e.target.value })}
               />
+              {loadingTags ? (
+                <div className="flex justify-center items-center">
+                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
+                </div>
+              ) : (
+                <TagField
+                  tags={serverAvailableTags.tags.map(
+                    (tag: ServerTagItem) => tag._id
+                  )}
+                  label="Tags of the song"
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setForm({
+                      ...song,
+                      tags: [e.target.value],
+                    });
+                  }}
+                  value={form.tags ? form.tags[0] : ""}
+                />
+              )}
             </div>
           </div>
         </div>
