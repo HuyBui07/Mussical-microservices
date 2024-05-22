@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// components
+import LoadingScreen from "../../Components/UtilComponents/LoadingScreen";
+
 export default function Register() {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   //register credentials
@@ -12,6 +16,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
+    setLoading(true);
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -41,12 +46,15 @@ export default function Register() {
       navigate("/");
     } catch (err: any) {
       setError(err.message);
-    } 
+    }  finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <div className=" bg-white h-screen flex flex-col justify-center px-6 py-12 lg:px-8">
+        {loading && <LoadingScreen />}
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-16 w-auto"

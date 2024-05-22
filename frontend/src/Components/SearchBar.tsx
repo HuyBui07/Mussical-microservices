@@ -5,15 +5,23 @@ import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
 export default function SearchBar({
   setSearchedSongs,
   invisible = false,
+  setLoadingState,
 }: {
   setSearchedSongs?: (songs: SongData[]) => void;
   invisible?: boolean;
+  setLoadingState?: (loading: boolean) => void;
 }): JSX.Element {
   const handleSearch = (searchText: string) => {
+    if (setLoadingState) {
+      setLoadingState(true);
+    }
     if (!setSearchedSongs) {
       return;
     }
     if (!searchText) {
+      if (setLoadingState) {
+        setLoadingState(false);
+      }
       setSearchedSongs([]);
       return;
     }
@@ -26,6 +34,10 @@ export default function SearchBar({
       })
       .then((res) => {
         setSearchedSongs(res.data);
+      }).then(() => {
+        if (setLoadingState) {
+          setLoadingState(false);
+        }
       })
       .catch((err) => console.log(err));
   };
