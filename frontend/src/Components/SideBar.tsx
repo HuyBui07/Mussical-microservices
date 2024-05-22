@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   HomeIcon,
   MusicalNoteIcon,
@@ -6,17 +5,14 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/16/solid";
 
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 export default function SideBar() {
-  const [isOpen, setIsOpen] = useState(false); // State để theo dõi trạng thái mở/đóng của submenu
   const navigate = useNavigate();
   const dispatch = useDispatch();
   // Hàm xử lý sự kiện khi click vào Chatbox
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+
   const navigateToHome = () => {
     navigate("/home");
   };
@@ -31,7 +27,7 @@ export default function SideBar() {
     localStorage.removeItem("email");
     localStorage.removeItem("token");
 
-    dispatch({type: "user/logout"});
+    dispatch({ type: "user/logout" });
 
     navigate("/");
   };
@@ -81,7 +77,6 @@ export default function SideBar() {
             <div
               className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600 text-white"
               onClick={() => {
-                toggleDropdown();
                 navigateToPlaylist();
               }}
             >
@@ -90,32 +85,9 @@ export default function SideBar() {
                 <span className="text-[15px] ml-4 text-gray-200 font-bold">
                   Playlist
                 </span>
-                <span className="text-sm rotate-180" id="arrow">
-                  <i
-                    className={`bi ${
-                      isOpen ? "bi-chevron-up" : "bi-chevron-down"
-                    }`}
-                  />
-                </span>
+                <span className="text-sm rotate-180" id="arrow"></span>
               </div>
             </div>
-            {/* Phần submenu */}
-            {isOpen && (
-              <div
-                className="text-left text-sm mt-2 w-4/5 mx-auto text-gray-200 font-bold"
-                id="submenu"
-              >
-                <h1 className="mx-6 cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                  Social
-                </h1>
-                <h1 className="mx-6 cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                  Personal
-                </h1>
-                <h1 className="mx-6  cursor-pointer p-2 hover:bg-blue-600 rounded-md mt-1">
-                  Friends
-                </h1>
-              </div>
-            )}
           </div>
           <div className="my-4 bg-gray-600 h-[1px]" />
           <div
