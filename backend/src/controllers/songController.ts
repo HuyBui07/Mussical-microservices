@@ -506,6 +506,9 @@ export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
       if (record.songId.toString() === song_id) {
         continue; // Skip the current song in history
       }
+      //If song doesn't exist, skip (might be deleted)
+      if (!(await Song.findById(record.songId))) continue;
+
       const song = await Song.findById(record.songId);
       if (!song) continue;
       const tags = song.tags;
