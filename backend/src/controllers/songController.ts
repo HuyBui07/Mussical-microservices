@@ -137,6 +137,29 @@ const deleteSong = async (req: Request, res: Response) => {
   }
 };
 
+export const getTags = async (req: Request, res: Response) => {
+  //Return all tag by scanning Songs
+  try {
+    const tags = await Song.aggregate([
+      {
+        $unwind: "$tags",
+      },
+      {
+        $group: {
+          _id: "$tags",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+    ]);
+    res.status(200).json(tags);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const updateSong = async (req: Request, res: Response) => {
   const { song_id } = req.params;
   //allowed update : title, artist, source, poster
@@ -243,7 +266,8 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
 
     const otherPercentage =
       100 - topTagsResult.reduce((acc, tag) => acc + tag.percentage, 0);
-    topTagsResult.push({ tag: "Other", percentage: otherPercentage });
+    if (otherPercentage > 0)
+      topTagsResult.push({ tag: "Other", percentage: otherPercentage });
 
     const topSongs = await HistoryRecord.aggregate([
       {

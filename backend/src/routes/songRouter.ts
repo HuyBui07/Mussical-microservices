@@ -8,6 +8,7 @@ import {
   updateSong,
   getThisMonthStats,
   injectionTest,
+  getTags,
 } from "../controllers/songController";
 
 //middleware
@@ -23,12 +24,13 @@ router.get("/stats", checkIsManager, getThisMonthStats);
 router.get("/stats/injection", checkIsManager, injectionTest);
 router.put("/:song_id", checkIsManager, updateSong);
 router.delete("/:song_id", checkIsManager, deleteSong);
-
+router.get("/stats/tags", checkIsManager, getTags);
 //For normal users
 router.use(requireAuth);
 
 router.get("/all", assignPagination, getAllSongs);
 router.get("/:song_id", getMetadataFromSongId);
 router.get("/:song_id/play", increaseListenCount);
+router.get("/tags", getTags);
 
 export default router;
