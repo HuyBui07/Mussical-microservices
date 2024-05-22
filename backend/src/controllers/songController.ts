@@ -31,13 +31,18 @@ const createSong = async (req: Request, res: Response) => {
 
     const posterUrl = posterResult.secure_url;
     const sourceUrl = sourceResult.secure_url;
+    //Split with space for tags
+    let { tags } = req.body;
 
-    // Create a new song
+    if (tags) {
+      tags = tags.split(" ");
+    }
     const newSong = new Song({
       title: req.body.title,
       artist: req.body.artist,
       poster: posterUrl,
       source: sourceUrl,
+      tags: tags || [],
     });
     await newSong.save();
     return res.status(201).json(newSong);
@@ -136,9 +141,8 @@ const deleteSong = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+//Return all tag by scanning Songs
 export const getTags = async (req: Request, res: Response) => {
-  //Return all tag by scanning Songs
   try {
     const tags = await Song.aggregate([
       {
