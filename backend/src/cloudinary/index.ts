@@ -77,7 +77,11 @@ const fileFilter = (
     cb(new Error("Unexpected field"));
   }
 };
-const upload = multer({ storage: multer.memoryStorage(), fileFilter });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 //Multer uploader take two file in two field, posterFile and sourceFile. Img accepted are jpg, jpeg, png. Audio is mp3 only
 export const multerSongUploader = upload.fields([
   { name: "posterFile", maxCount: 1 },
