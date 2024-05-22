@@ -6,7 +6,7 @@ export interface Song {
   source: string;
   poster: string;
   listenCount?: number;
-  tags?: string[];
+  tags: string[];
   dateCreated?: Date;
 }
 
