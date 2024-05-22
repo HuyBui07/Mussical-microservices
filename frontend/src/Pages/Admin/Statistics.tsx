@@ -168,7 +168,11 @@ export default function ChartLine() {
             series={[
               {
                 //Show value, format to show only 1 decimal
-                arcLabel: (item) => `${item.value.toFixed(1)}%`,
+                //If less than 10%, don't show
+                arcLabel: (item) => {
+                  if (item.value < 10) return "";
+                  return `${item.value.toFixed(1)}%`;
+                },
                 data: topTags.map((tag) => ({
                   value: tag.percentage,
                   label: tag.tag,
@@ -200,7 +204,7 @@ export default function ChartLine() {
                 direction: "row",
                 itemGap: 10,
                 position: {
-                  vertical: "middle",
+                  vertical: "bottom",
                   horizontal: "right",
                 },
                 labelStyle: {
