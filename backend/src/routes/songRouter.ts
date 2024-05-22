@@ -4,18 +4,24 @@ import {
   createSong,
   getMetadataFromSongId,
   deleteSong,
+  increaseListenCount,
 } from "../controllers/songController";
 
 //middleware
 import { requireAuth } from "../middlewares/requireAuth";
 import checkIsManager from "../middlewares/checkIsManager";
+import { multerSongUploader } from "../cloudinary";
 
 const router = express.Router();
-router.use(requireAuth);
+//For managers
+//Exclude use requierAuth on createSong. checkIsManager is enough
+router.post("/", checkIsManager, multerSongUploader, createSong);
+router.get("/delete/:song_id", checkIsManager, deleteSong);
 
+//For normal users
+router.use(requireAuth);
 router.get("/all", getAllSongs);
-router.get("/delete/:song_id",checkIsManager, deleteSong);
 router.get("/:song_id", getMetadataFromSongId);
-router.post("/create", checkIsManager, createSong);
+router.get("/:song_id/play", increaseListenCount);
 
 export default router;
