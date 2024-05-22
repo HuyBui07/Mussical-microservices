@@ -8,6 +8,12 @@ interface IUser extends Document {
   email: string;
   passwordHash: string;
   role: Role;
+  history: {
+    type: Schema.Types.ObjectId;
+    ref: "HistoryRecord";
+    required: false;
+    default: [];
+  };
 }
 
 interface IUserModel extends Model<IUser> {
@@ -18,6 +24,17 @@ interface IUserModel extends Model<IUser> {
 const userSchema = new Schema<IUser>({
   email: { type: String, required: true },
   passwordHash: { type: String, required: true },
+  role: {
+    type: String,
+    required: false,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  history: {
+    type: [{ type: Schema.Types.ObjectId, ref: "HistoryRecord" }],
+    required: false,
+    default: [],
+  },
 });
 
 userSchema.statics.logIn = async function (email, password) {
