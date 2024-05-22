@@ -79,42 +79,13 @@ export default function ChartLine() {
       console.error("Failed to fetch stats", error);
     }
   };
-  const callInjectionTest = async () => {
-    try {
-      const adminToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
-      // const res = await fetch(
-      //   "http://localhost:4000/api/songs/stats/injection",
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${adminToken}`,
-      //     },
-      //   }
-      // );
 
-      // songs/stats/tags
-      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      const data = await res.json();
-      console.log("Result from injection test", data);
-    } catch (error) {
-      console.error("Injection test failed", error);
-    }
-  };
   useEffect(() => {
     requestStat();
   }, []);
 
   return (
     <>
-      <Button onClick={callInjectionTest}>Test Injection</Button>
       <div className="flex flex-row justify-between gap-2">
         <div
           className="my-2 ml-6 bg-zinc-800 h-[60vh] w-[50%] flex flex-row py-10 px-10"
