@@ -30,6 +30,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get<SongData[]>("http://localhost:4000/api/songs/all", {
         headers: {
@@ -43,6 +44,7 @@ export default function Home() {
       .then((res) => {
         setSongs(res.data);
         setTotalPage(res.headers["x-total-count"] / limit);
+        setLoading(false);
       })
       .catch((err) => console.log(err));
   }, [page]);
