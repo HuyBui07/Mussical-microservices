@@ -5,6 +5,9 @@ export interface Song {
   artist: string;
   source: string;
   poster: string;
+  listenCount?: number;
+  tags?: string[];
+  dateCreated?: Date;
 }
 
 const songSchema: Schema = new Schema({
@@ -14,6 +17,7 @@ const songSchema: Schema = new Schema({
   poster: { type: String, required: true },
   listenCount: { type: Number, required: false, default: 0 },
   tags: { type: [String], required: false, default: [] },
+  dateCreated: { type: Date, required: false, default: Date.now },
 });
 
 export default mongoose.model<Song>("Song", songSchema);

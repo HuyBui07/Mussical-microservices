@@ -76,8 +76,9 @@ export default function AdminSideBar() {
             onClick={() => navigateToUser()}
           >
             <UserIcon className="w-8 mx-0" />
+
             <span className="text-[15px] ml-4 text-gray-200 font-bold">
-              Users
+              Admins
             </span>
           </div>
           <div className="my-4 bg-gray-600 h-[1px]" />

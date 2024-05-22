@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormField from "../../UtilComponents/FormField";
 
-interface SongUploadProps {
+export interface SongUploadProps {
   title: string;
   artist: string;
+  tags?: string[];
   posterFile: File | undefined | null;
+
   sourceFile: File | undefined | null;
 }
-
+export interface ServerTagItem {
+  _id: string; //name of tag
+  count: number; //number of songs with this tag
+}
+export interface ServerTagResponse {
+  tags: ServerTagItem[];
+}
 const AddSongModal = ({
   closeModal,
   afterSave,
@@ -15,17 +23,24 @@ const AddSongModal = ({
   closeModal: () => void;
   afterSave: () => void;
 }) => {
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
   const [formData, setFormData] = useState<SongUploadProps>({
     title: "",
     artist: "",
     posterFile: null,
     sourceFile: null,
+    tags: [],
   });
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [serverAvailableTags, setServerAvailableTags] =
+    useState<ServerTagResponse>({
+      tags: [],
+    });
+  const [loadingTags, setLoadingTags] = useState<boolean>(true);
   const handleSave = async () => {
-    //Append token to request
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
+    setLoading(true);
+
     const data = new FormData();
     data.append("title", formData.title);
     data.append("artist", formData.artist);
@@ -34,6 +49,11 @@ const AddSongModal = ({
     }
     if (formData.sourceFile) {
       data.append("sourceFile", formData.sourceFile);
+    }
+    //tags is split using space
+    const tags = formData.tags?.join(" ");
+    if (tags) {
+      data.append("tags", tags);
     }
     console.log("Data before fetch", data);
     try {
@@ -51,8 +71,24 @@ const AddSongModal = ({
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
     }
+    setLoading(false);
   };
-
+  useEffect(() => {
+    const fetchTags = async () => {
+      setLoadingTags(true);
+      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data: ServerTagItem[] = await res.json();
+      setServerAvailableTags({ tags: [...data, { _id: "Other", count: 0 }] });
+      setLoadingTags(false);
+    };
+    fetchTags();
+  }, []);
   return (
     <div
       className="fixed inset-0 z-10 overflow-y-auto"
@@ -124,6 +160,26 @@ const AddSongModal = ({
                       })
                     }
                   />
+                  {loadingTags ? (
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
+                    </div>
+                  ) : (
+                    <TagField
+                      tags={serverAvailableTags.tags.map(
+                        (tag: ServerTagItem) => tag._id
+                      )}
+                      label="Tags of the song"
+                      onChange={(e) => {
+                        console.log(e.target.value);
+                        setFormData({
+                          ...formData,
+                          tags: [e.target.value],
+                        });
+                      }}
+                      value={formData.tags ? formData.tags[0] : ""}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -133,14 +189,45 @@ const AddSongModal = ({
             <button
               type="button"
               onClick={handleSave}
-              className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+              className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm`}
+              disabled={loading}
             >
-              Save
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : (
+                "Save"
+              )}
             </button>
             <button
               type="button"
               onClick={closeModal}
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 ${
+                loading ? "cursor-not-allowed" : "hover:bg-gray-50"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
+              disabled={loading}
             >
               Cancel
             </button>
@@ -229,6 +316,71 @@ const UploadFormField = ({
           {value && <p className="text-xs text-gray-500">{value.size} bytes</p>}
         </div>
       </div>
+    </div>
+  );
+};
+
+//Will load tags available from the API, allow user to choose from available tags, if user choose "other", then show a input field for user to input new tag
+
+export const TagField = ({
+  label,
+  tags,
+  value,
+  onChange,
+}: {
+  label: string;
+  tags: string[];
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+}) => {
+  const [currenTag, setCurrentTag] = useState<string>(value);
+  const [newTag, setNewTag] = useState<string>("");
+
+  useEffect(() => {
+    if (newTag !== "") {
+      onChange({
+        target: { value: newTag },
+      } as unknown as React.ChangeEvent<HTMLSelectElement>);
+    }
+  }, [newTag]);
+  return (
+    <div>
+      <label
+        htmlFor="tag-select"
+        className="block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
+      <select
+        id="tag-select"
+        name="tag-select"
+        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md text-white bg-gray-800"
+        value={currenTag}
+        onChange={(e) => {
+          if (e.target.value === "Other") {
+            setNewTag("");
+            setCurrentTag("Other");
+          } else {
+            setCurrentTag(e.target.value);
+            onChange(e);
+          }
+        }}
+      >
+        {tags.map((tag) => (
+          <option key={tag} value={tag}>
+            {tag}
+          </option>
+        ))}
+      </select>
+      {currenTag === "Other" ? (
+        <FormField
+          label="New Tag"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

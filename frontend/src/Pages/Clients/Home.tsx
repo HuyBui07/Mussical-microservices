@@ -6,7 +6,6 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
   UserCircleIcon,
-  BellAlertIcon,
 } from "@heroicons/react/16/solid";
 import Song from "../../Components/Song";
 import MusicPlayer from "../../Components/MusicPlayer";
@@ -15,12 +14,16 @@ import AddToPlaylistPopup from "../../Components/UtilComponents/AddToPlaylistPop
 import SearchBar from "../../Components/SearchBar";
 import LoadingCircle from "../../Components/UtilComponents/LoadingCircle";
 
+import "../../../index.css";
+const limit = 4;
 export default function Home() {
   const navigate = useNavigate();
   const [songs, setSongs] = useState<SongData[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(1);
   const email = useSelector((state: any) => state.user.email);
 
   // Loading circle state
@@ -32,11 +35,17 @@ export default function Home() {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        params: {
+          page,
+          limit: 4,
+        },
       })
-      .then((res) => setSongs(res.data))
-      .then(() => setLoading(false))
+      .then((res) => {
+        setSongs(res.data);
+        setTotalPage(res.headers["x-total-count"] / limit);
+      })
       .catch((err) => console.log(err));
-  }, []);
+  }, [page]);
 
   const handleSongClick = (song: SongData) => {
     setSelectedSong(song);
@@ -72,8 +81,20 @@ export default function Home() {
                 Recent Songs
               </h2>
               <div className="flex flex-row">
-                <ChevronLeftIcon className="w-6" />
-                <ChevronRightIcon className="w-6" />
+                <ChevronLeftIcon
+                  color="white"
+                  className="w-6 chevron-icon"
+                  onClick={() => {
+                    page > 1 && setPage(page - 1);
+                  }}
+                />
+                <ChevronRightIcon
+                  color="white"
+                  className="w-6 chevron-icon"
+                  onClick={() => {
+                    page < totalPage && setPage(page + 1);
+                  }}
+                />
               </div>
             </div>
             {loading ? (
@@ -100,8 +121,8 @@ export default function Home() {
                 Top Picks For You
               </h2>
               <div className="flex flex-row">
-                <ChevronLeftIcon className="w-6" />
-                <ChevronRightIcon className="w-6" />
+                <ChevronLeftIcon className="w-6 chevron-icon" />
+                <ChevronRightIcon className="w-6 chevron-icon" />
               </div>
             </div>
             {loading ? (

@@ -53,7 +53,7 @@ const AlbumTable = ({
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
                   {data.map((song) => (
-                    <tr key={song.id} className="hover:bg-gray-400">
+                    <tr key={song._id} className="hover:bg-gray-400">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 dark:text-neutral-200">
                         {song.title}
                       </td>
