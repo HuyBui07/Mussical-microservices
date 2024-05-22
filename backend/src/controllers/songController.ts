@@ -78,14 +78,27 @@ const getAllSongs = async (req: Request, res: Response) => {
 export const getRecentSongs = async (req: Request, res: Response) => {
   const { page, limit } = (req as PaginatedRequest).pagination;
   try {
+    // Retrieve songs sorted by createdAt in descending order
     const songs = await Song.find({})
-      .sort({ createdAt: -1 })
+      .sort({ dateCreated: 1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
+
+    // Count the total number of songs
     const totalCount = await Song.countDocuments({}).exec();
-    //Randomize the order of songs
+
+    // Assign current date to songs without a creation date
+    songs.forEach((song) => {
+      if (!song.dateCreated || song.dateCreated.toString() === "Invalid Date") {
+        song.dateCreated = new Date();
+      }
+    });
+
+    // Randomize the order of songs
     songs.sort(() => Math.random() - 0.5);
+
+    // Set total count header and send the response
     res.setHeader("X-Total-Count", totalCount.toString());
     res.status(200).json(songs);
   } catch (err: any) {
@@ -93,6 +106,8 @@ export const getRecentSongs = async (req: Request, res: Response) => {
   }
 };
 //For you: get user most listened tags. Then get songs with those tags
+// Songs are then ranked by listen count, randomized for each page, ensure that the total count is still the same as the total number of songs
+// throughout the system, to ensure that front end pagination works correctly
 //If no history available, return popular songs
 export const getForYouSongs = async (req: AuthRequest, res: Response) => {
   const user = req.user;
@@ -100,15 +115,8 @@ export const getForYouSongs = async (req: AuthRequest, res: Response) => {
   try {
     const userHistory = await HistoryRecord.find({ userId: user?._id }).exec();
     if (userHistory.length === 0) {
-      //If user has no history, return popular songs
-      const songs = await Song.find({})
-        .sort({ listenCount: -1 })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .exec();
-      const totalCount = await Song.countDocuments({}).exec();
-      res.setHeader("X-Total-Count", totalCount.toString());
-      return res.status(200).json(songs);
+      //No history available, return popular songs
+      return getPopularSongs(req, res);
     }
 
     //Get user most listened tags
@@ -121,17 +129,28 @@ export const getForYouSongs = async (req: AuthRequest, res: Response) => {
         tagScore.set(tag, currentScore + 1);
       }
     }
-
+    //Sort tags by score
     const sortedTags = Array.from(tagScore).sort((a, b) => b[1] - a[1]);
-    console.log("Sorted tags: ", sortedTags);
-    const mostListenedTag = sortedTags[0][0];
-    const songs = await Song.find({ tags: mostListenedTag })
+    //Get songs with those tags
+    const totalCount = await Song.countDocuments({}).exec();
+    //Get songs with tags first, if not enough, get songs without tags
+    const songs = await Song.find({
+      tags: { $in: sortedTags.map((tag) => tag[0]) },
+    })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
-    const totalCount = await Song.countDocuments({
-      tags: mostListenedTag,
-    }).exec();
+    if (songs.length < limit) {
+      const remainingSongs = await Song.find({
+        tags: { $nin: sortedTags.map((tag) => tag[0]) },
+      })
+        .limit(limit - songs.length)
+        .exec();
+      songs.push(...remainingSongs);
+    }
+    //Randomize the order of songs
+    songs.sort(() => Math.random() - 0.5);
+
     res.setHeader("X-Total-Count", totalCount.toString());
     res.status(200).json(songs);
   } catch (err: any) {
