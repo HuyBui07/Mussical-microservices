@@ -74,6 +74,87 @@ const getAllSongs = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+//Get songs , based on creation date
+export const getRecentSongs = async (req: Request, res: Response) => {
+  const { page, limit } = (req as PaginatedRequest).pagination;
+  try {
+    const songs = await Song.find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
+    const totalCount = await Song.countDocuments({}).exec();
+    //Randomize the order of songs
+    songs.sort(() => Math.random() - 0.5);
+    res.setHeader("X-Total-Count", totalCount.toString());
+    res.status(200).json(songs);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+//For you: get user most listened tags. Then get songs with those tags
+//If no history available, return popular songs
+export const getForYouSongs = async (req: AuthRequest, res: Response) => {
+  const user = req.user;
+  const { page, limit } = (req as PaginatedRequest).pagination;
+  try {
+    const userHistory = await HistoryRecord.find({ userId: user?._id }).exec();
+    if (userHistory.length === 0) {
+      //If user has no history, return popular songs
+      const songs = await Song.find({})
+        .sort({ listenCount: -1 })
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .exec();
+      const totalCount = await Song.countDocuments({}).exec();
+      res.setHeader("X-Total-Count", totalCount.toString());
+      return res.status(200).json(songs);
+    }
+
+    //Get user most listened tags
+    const tagScore = new Map<string, number>();
+    for (const record of userHistory) {
+      const song = await Song.findById(record.songId);
+      if (!song) continue;
+      for (const tag of song.tags) {
+        const currentScore = tagScore.get(tag) ?? 0;
+        tagScore.set(tag, currentScore + 1);
+      }
+    }
+
+    const sortedTags = Array.from(tagScore).sort((a, b) => b[1] - a[1]);
+    console.log("Sorted tags: ", sortedTags);
+    const mostListenedTag = sortedTags[0][0];
+    const songs = await Song.find({ tags: mostListenedTag })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
+    const totalCount = await Song.countDocuments({
+      tags: mostListenedTag,
+    }).exec();
+    res.setHeader("X-Total-Count", totalCount.toString());
+    res.status(200).json(songs);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+//popular songs: get top songs , using limit and and page
+export const getPopularSongs = async (req: Request, res: Response) => {
+  const { page, limit } = (req as PaginatedRequest).pagination;
+  try {
+    const songs = await Song.find({})
+      .sort({ listenCount: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
+    const totalCount = await Song.countDocuments({}).exec();
+    res.setHeader("X-Total-Count", totalCount.toString());
+    res.status(200).json(songs);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 //get metadata from a song id
 const getMetadataFromSongId = async (req: Request, res: Response) => {
@@ -99,8 +180,10 @@ const increaseListenCount = async (req: AuthRequest, res: Response) => {
   //get user id , then create history record
   const user_id = req.user?._id;
   try {
-    await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
-
+    const song = await Song.findByIdAndUpdate(song_id, {
+      $inc: { listenCount: 1 },
+    }).exec();
+    console.log("Song listen count increased: ", song);
     const newRecord = new HistoryRecord({
       userId: user_id,
       songId: song_id,
@@ -364,6 +447,90 @@ export const injectionTest = async (req: Request, res: Response) => {
 
   console.log("Injection test finished!");
   res.status(200).json({ message: "Injection test finished" });
+};
+
+//Receive song id of a song user has just listened to
+//Return 1 song id (not the current song id)
+//Extremely query heavy, not recommended to query multiple times
+export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
+  const { song_id } = req.query;
+  console.log("Recommend next song for song id: ", song_id);
+  //Value to adjust for influence of tags and artist
+  const tagWeight = 2.5;
+  const artistWeight = 1;
+
+  const song = await Song.findById(song_id);
+  const user = await User.findById(req.user?._id);
+  if (!song) {
+    return res.status(404).json({ message: "Song not found" });
+  }
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  try {
+    const currentTags = song.tags;
+    const currentArtist = song.artist;
+    const userHistory = await HistoryRecord.find({ userId: user._id }).exec();
+    // If user has no history, return a random song excluding the current song
+    if (userHistory.length === 0) {
+      const randomSong = await Song.aggregate([
+        { $match: { _id: { $ne: song._id } } },
+        { $sample: { size: 1 } },
+      ]);
+      return res.status(200).json(randomSong[0]);
+    }
+
+    const tagScore = new Map<string, number>();
+    const artistScore = new Map<string, number>();
+
+    // Process user history
+    for (const record of userHistory) {
+      const historySong = await Song.findById(record.songId);
+      if (!historySong) continue;
+
+      const tags = historySong.tags;
+      for (const tag of tags) {
+        const currentTagScore = tagScore.get(tag) ?? 0;
+        const increment = currentTags.includes(tag) ? tagWeight * 2 : tagWeight;
+        tagScore.set(tag, currentTagScore + increment);
+      }
+
+      const artist = historySong.artist;
+      const currentArtistScore = artistScore.get(artist) ?? 0;
+      const increment =
+        currentArtist === artist ? artistWeight * 2 : artistWeight;
+      artistScore.set(artist, currentArtistScore + increment);
+    }
+
+    const sortedTags = Array.from(tagScore).sort((a, b) => b[1] - a[1]);
+    const sortedArtists = Array.from(artistScore).sort((a, b) => b[1] - a[1]);
+
+    let nextSong: any;
+    for (let i = 0; i < sortedTags.length; i++) {
+      nextSong = await Song.findOne({
+        _id: { $ne: song._id },
+        tags: sortedTags[i][0],
+        artist: sortedArtists[i] ? sortedArtists[i][0] : undefined,
+      });
+      if (nextSong) {
+        break;
+      }
+    }
+
+    if (!nextSong) {
+      const randomSong = await Song.aggregate([
+        { $match: { _id: { $ne: song._id } } },
+        { $sample: { size: 1 } },
+      ]);
+      return res.status(200).json(randomSong[0]);
+    }
+    console.log("Recommended next song: ", nextSong);
+    res.status(200).json(nextSong);
+  } catch (err: any) {
+    console.log("Recommend next song error", err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export {

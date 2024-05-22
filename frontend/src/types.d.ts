@@ -10,4 +10,5 @@ declare interface SongData {
   poster: string;
   artist: string;
   source: string;
+  tags?: string[];
 }

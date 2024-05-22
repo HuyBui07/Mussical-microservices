@@ -5,9 +5,13 @@ import "react-h5-audio-player/lib/styles.css";
 
 interface MusicPlayerProps {
   selectedSong: SongData | null;
+  onSongEnd: (id: number) => void;
 }
 
-const MusicPlayer: React.FC<MusicPlayerProps> = ({ selectedSong }) => {
+const MusicPlayer: React.FC<MusicPlayerProps> = ({
+  selectedSong,
+  onSongEnd,
+}) => {
   return (
     <div className="m-2 bg-zinc-800" style={{ borderRadius: "10px" }}>
       <div className="h-full w-full">
@@ -22,7 +26,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ selectedSong }) => {
               loading="lazy"
               hidden={!selectedSong}
             />
-            <div className="min-w-0 flex-auto space-y-1 font-semibold" hidden={!selectedSong}>
+            <div
+              className="min-w-0 flex-auto space-y-1 font-semibold"
+              hidden={!selectedSong}
+            >
               <p className="text-cyan-500 dark:text-cyan-400 text-sm leading-6">
                 <abbr title="Track">Track:</abbr> 05
               </p>
@@ -42,7 +49,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ selectedSong }) => {
               src={selectedSong ? selectedSong.source : ""}
               className="mt-[-10px] bg-transparent"
               customVolumeControls={[]}
-              style={selectedSong ? { width: "100%" } : { opacity: 0.1}}
+              autoPlayAfterSrcChange={true}
+              autoPlay={true}
+              onEnded={() => {
+                if (selectedSong) {
+                  onSongEnd(selectedSong._id);
+                } else console.log("Song ended. No more songs to play.");
+              }}
+              style={selectedSong ? { width: "100%" } : { opacity: 0.1 }}
             />
           </div>
         </div>
