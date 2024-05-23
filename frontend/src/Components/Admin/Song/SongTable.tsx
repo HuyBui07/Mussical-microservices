@@ -30,10 +30,12 @@ const SongTable = forwardRef<
   }, [page]);
 
   const fetchSongs = async () => {
+    const adminToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs";
     axios
-      .get<AdminSongItem[]>("http://localhost:4000/api/songs/all", {
+      .get<AdminSongItem[]>("http://localhost:4000/api/songs/stats/songs", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${adminToken}`,
         },
         params: {
           page: page,
