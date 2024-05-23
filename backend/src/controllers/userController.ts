@@ -3,13 +3,13 @@ import User from "../models/userModel";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middlewares/requireAuth";
 
-const createToken = (_id: string) => {
+export const createToken = (_id: string) => {
   return jwt.sign({ _id }, process.env.SECRET_KEY as string, {
     expiresIn: "3d",
   });
 };
 
-const loginUser = async (req: Request, res: Response): Promise<void> => {
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
@@ -22,11 +22,15 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
       token,
     });
   } catch (err: any) {
+    console.log(err);
     res.status(400).json({ message: err.message });
   }
 };
 
-const registerUser = async (req: Request, res: Response): Promise<void> => {
+export const registerUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { email, password } = req.body;
 
   try {
@@ -42,5 +46,3 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     res.status(400).json({ message: err.message });
   }
 };
-
-export { loginUser, registerUser };

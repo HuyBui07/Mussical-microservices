@@ -3,6 +3,7 @@ import { v2 as cloudinaryClient } from "cloudinary";
 import multer from "multer";
 import { FileFilterCallback } from "multer";
 import { Request } from "express";
+
 cloudinaryClient.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
