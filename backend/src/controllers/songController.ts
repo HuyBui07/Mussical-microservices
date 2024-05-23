@@ -175,7 +175,7 @@ export const getPopularSongs = async (req: Request, res: Response) => {
 };
 
 //get metadata from a song id
-const getMetadataFromSongId = async (req: Request, res: Response) => {
+export const getMetadataFromSongId = async (req: Request, res: Response) => {
   const { song_id } = req.params;
 
   try {
@@ -184,7 +184,6 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Song not found" });
     }
     //If found , increase song listen count
-    await Song.findByIdAndUpdate(song_id, { $inc: { listenCount: 1 } }).exec();
     res.status(200).json(song);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -192,7 +191,7 @@ const getMetadataFromSongId = async (req: Request, res: Response) => {
 };
 
 //increase listen count of a song and create a history record
-const increaseListenCount = async (req: AuthRequest, res: Response) => {
+export const increaseListenCount = async (req: AuthRequest, res: Response) => {
   const { song_id } = req.params;
   const defaultDelay = 10000; //10 seconds
   //get user id , then create history record
@@ -216,7 +215,7 @@ const increaseListenCount = async (req: AuthRequest, res: Response) => {
 };
 
 //delete a song
-const deleteSong = async (req: Request, res: Response) => {
+export const deleteSong = async (req: Request, res: Response) => {
   const { song_id } = req.params;
 
   try {
@@ -259,6 +258,8 @@ export const getTags = async (req: Request, res: Response) => {
         $sort: { count: -1 },
       },
     ]);
+
+    console.log("Tags: ", tags);
     res.status(200).json(tags);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -549,5 +550,3 @@ export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-export { getMetadataFromSongId, deleteSong, increaseListenCount };
