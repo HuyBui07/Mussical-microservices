@@ -9,7 +9,7 @@ import HistoryRecord from "../models/historyRecord";
 import { AuthRequest } from "../middlewares/requireAuth";
 import User from "../models/userModel";
 //create a new song
-const createSong = async (req: Request, res: Response) => {
+export const createSong = async (req: Request, res: Response) => {
   if (
     !req.files ||
     !("posterFile" in req.files) ||
@@ -53,7 +53,7 @@ const createSong = async (req: Request, res: Response) => {
 };
 
 //get all songs for the main screen ()
-const getAllSongs = async (req: Request, res: Response) => {
+export const getAllSongs = async (req: Request, res: Response) => {
   const title = (req.query.title as string) || "";
   const { page, limit } = (req as PaginatedRequest).pagination;
   try {
@@ -550,10 +550,4 @@ export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export {
-  getAllSongs,
-  createSong,
-  getMetadataFromSongId,
-  deleteSong,
-  increaseListenCount,
-};
+export { getMetadataFromSongId, deleteSong, increaseListenCount };
