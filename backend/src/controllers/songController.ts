@@ -221,6 +221,9 @@ export const deleteSong = async (req: Request, res: Response) => {
 
   try {
     const song = await Song.findByIdAndDelete(song_id);
+    if (!song) {
+      return res.status(404).json({ message: "Song not found" });
+    }
     //Call the cloudinary api to delete the poster and source
     const posterUrl = song?.poster;
     const sourceUrl = song?.source;
