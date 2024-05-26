@@ -4,16 +4,16 @@ import { useState } from "react";
 import axios from "axios";
 import ConfirmPopup from "./UtilComponents/ConfirmPopup";
 import RemoveButton from "./UtilComponents/RemoveButton";
-
+import { useSongData } from "../Layout/ClientLayout/ClientLayout";
 interface SongItemProps {
   songId: number;
-  onClick: (song: SongData) => void;
+  onClick?: (song: SongData) => void;
   playListId: string;
   onRemove: () => void;
 }
 
 // Used in Playlist tab to display songs from a playlist
-const SongItem: React.FC<SongItemProps> = ({
+const PlaylistSongItem: React.FC<SongItemProps> = ({
   songId,
   onClick,
   playListId,
@@ -22,7 +22,7 @@ const SongItem: React.FC<SongItemProps> = ({
   const [song, setSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [length, setLength] = useState<string>("");
-
+  const { setSelectedSong } = useSongData();
   useEffect(() => {
     console.log("Playlist ID: ", playListId);
     // Fetch song data
@@ -106,7 +106,12 @@ const SongItem: React.FC<SongItemProps> = ({
         <div className="flex flex-row justify-between items-center song-item hover:bg-gray-700 cursor-pointer p-2 rounded-lg my-2 bg-gray-800">
           <div
             className="flex flex-row items-center space-x-4 flex-grow justify-between mr-4"
-            onClick={() => onClick(song)}
+            onClick={() => {
+              setSelectedSong(song);
+              if (onClick) {
+                onClick(song);
+              }
+            }}
           >
             <div className="flex flex-row items-center">
               <img
@@ -137,4 +142,4 @@ const SongItem: React.FC<SongItemProps> = ({
   );
 };
 
-export default SongItem;
+export default PlaylistSongItem;

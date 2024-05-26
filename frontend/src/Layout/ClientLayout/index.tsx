@@ -1,1 +1,3 @@
-export { default } from "./ClientLayout";
+import { ClientLayout } from "./ClientLayout";
+
+export default ClientLayout;

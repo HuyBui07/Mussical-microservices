@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
-import MusicPlayer from "../../Components/MusicPlayer";
+
 import NavBar from "../../Components/NavBar";
 import axios from "axios";
 import PlaylistItem from "../../Components/PlaylistItem";
-import SongItem from "../../Components/SongItem";
-import ConfirmPopup from "../../Components/UtilComponents/ConfirmPopup";
+import PlaylistSongItem from "../../Components/SongItem";
+
 import CreatePlaylistButton from "../../Components/UtilComponents/CreatePlaylistButton";
 
 const Playlist: React.FC = () => {
@@ -13,7 +13,6 @@ const Playlist: React.FC = () => {
   const [selectedPlaylist, setSelectedPlaylist] = useState<PlaylistData | null>(
     null
   );
-  const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
 
   useEffect(() => {
     fetchPlaylists();
@@ -37,14 +36,10 @@ const Playlist: React.FC = () => {
     setSelectedPlaylist(playlist);
   };
 
-  const handleSongSelect = (song: SongData) => {
-    setSelectedSong(song);
-  };
-
   return (
     <>
       <div
-        className="m-2 mb-8 ml-4 bg-zinc-800 h-[80%]"
+        className="m-2 mb-2 ml-4 bg-zinc-800 h-[80%]"
         style={{ borderRadius: "10px" }}
       >
         <NavBar />
@@ -95,10 +90,9 @@ const Playlist: React.FC = () => {
               </h2>
               <div className="grid grid-cols-1 gap-y-4">
                 {selectedPlaylist.songs.map((songId) => (
-                  <SongItem
+                  <PlaylistSongItem
                     key={songId}
                     songId={songId}
-                    onClick={handleSongSelect}
                     playListId={selectedPlaylist._id}
                     onRemove={() => {
                       //If play list has 0 song , set null
@@ -121,14 +115,6 @@ const Playlist: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Music player */}
-      <div
-        className="mx-2 mt-[-25px] ml-4 bg-zinc-800 h-[17%]"
-        style={{ borderRadius: "10px" }}
-      >
-        <MusicPlayer selectedSong={selectedSong} onSongEnd={() => {}} />
       </div>
     </>
   );

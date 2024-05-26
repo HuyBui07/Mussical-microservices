@@ -7,15 +7,18 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/16/solid";
 import Song from "../../Components/Song";
-import MusicPlayer from "../../Components/MusicPlayer";
+
 import axios from "axios";
 import AddToPlaylistPopup from "../../Components/UtilComponents/AddToPlaylistPopup";
 import LoadingCircle from "../../Components/UtilComponents/LoadingCircle";
-
+import { useSongData } from "../../Layout/ClientLayout/ClientLayout";
 import "../../../index.css";
+
 const limit = 4;
+
 export default function Home() {
   const navigate = useNavigate();
+  //Songs query
   const [recentSongs, setRecentSongs] = useState<SongData[]>([]);
   const [forYouSongs, setForYouSongs] = useState<SongData[]>([]);
   const [recentPage, setRecentPage] = useState<number>(1);
@@ -24,12 +27,18 @@ export default function Home() {
   const [totalForYouPage, setTotalForYouPage] = useState<number>(1);
   const [recentLoading, setRecentLoading] = useState(true);
   const [forYouLoading, setForYouLoading] = useState(true);
-  const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
+  //Add to playlist popup
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [currentAddSong, setCurrentAddSong] = useState<SongData | null>(null);
 
   const email = useSelector((state: any) => state.user.email);
-  const [loadingNewSong, setLoadingNewSong] = useState(false);
+
+  // Use the global song context
+  const {
+    selectedSong,
+
+    setAutoRecommend,
+  } = useSongData();
 
   useEffect(() => {
     setRecentLoading(true);
@@ -71,26 +80,10 @@ export default function Home() {
       .catch((err) => console.log(err));
   }, [forYouPage]);
 
-  const onSongFinished = async (id: number) => {
-    setLoadingNewSong(true);
-    console.log("Song Finished");
-    console.log("Calling recommendation API for id: " + id);
-    const res = await axios.get("http://localhost:4000/api/songs/recommend", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      params: {
-        song_id: id,
-      },
-    });
-    setSelectedSong({ ...res.data, _id: res.data._id });
-    setLoadingNewSong(false);
-    console.log("Recommendation API response: ", res.data);
-  };
-
-  const handleSongClick = (song: SongData) => {
-    setSelectedSong(song);
-  };
+  useEffect(() => {
+    setAutoRecommend && setAutoRecommend(true);
+  }, []);
+  useEffect(() => {}, []);
 
   const handleAddToPlaylistPopup = () => {
     setShowPopup(true);
@@ -160,7 +153,6 @@ export default function Home() {
                   <Song
                     key={song._id}
                     data={song}
-                    onClick={() => handleSongClick(song)}
                     onClickAdd={() => {
                       setCurrentAddSong(song);
                       handleAddToPlaylistPopup();
@@ -201,7 +193,6 @@ export default function Home() {
                   <Song
                     key={song._id}
                     data={song}
-                    onClick={() => handleSongClick(song)}
                     onClickAdd={() => {
                       setCurrentAddSong(song);
                       handleAddToPlaylistPopup();
@@ -213,15 +204,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="mx-2 ml-4 bg-zinc-800" style={{ borderRadius: "10px" }}>
-        {loadingNewSong ? (
-          <div className="py-1">
-            <LoadingCircle color="white" size={70} />
-          </div>
-        ) : (
-          <MusicPlayer selectedSong={selectedSong} onSongEnd={onSongFinished} />
-        )}
-      </div>
+
       {showPopup && (
         <AddToPlaylistPopup
           songId={currentAddSong?._id}

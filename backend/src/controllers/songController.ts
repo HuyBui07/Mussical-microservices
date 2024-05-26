@@ -487,6 +487,7 @@ export const injectionTest = async (req: Request, res: Response) => {
 export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
   const { song_id } = req.query;
   console.log("Recommend next song for song id: ", song_id);
+
   //Value to adjust for influence of tags and artist
   const tagWeight = 2.5;
   const artistWeight = 1;

@@ -2,20 +2,18 @@
 
 import { PlayCircleIcon } from "@heroicons/react/16/solid";
 import AddButton from "./UtilComponents/AddButton";
-
+import { useSongData } from "../Layout/ClientLayout/ClientLayout";
 interface SongProps {
-  data: {
-    _id: number;
-    title: string;
-    poster: string;
-  };
-  onClick: () => void;
+  data: SongData;
+  onClick?: () => void;
   onClickAdd: () => void;
   //default true
   increaseListenCount?: boolean;
 }
 //Used in song discovery/ search results. Will automatically increase listen count every time a song is played
 const Song: React.FC<SongProps> = ({ data, onClick, onClickAdd }) => {
+  const { setSelectedSong } = useSongData();
+
   return (
     <a className="group relative">
       <div className="absolute top-1 right-1 z-10">
@@ -39,7 +37,10 @@ const Song: React.FC<SongProps> = ({ data, onClick, onClickAdd }) => {
           } else {
             console.error("Failed to increase listen count");
           }
-          if (onClick) onClick();
+          if (onClick) {
+            onClick();
+          }
+          setSelectedSong(data);
         }}
       >
         <img
