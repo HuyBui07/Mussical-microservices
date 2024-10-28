@@ -7,6 +7,9 @@ import mongoose from "mongoose";
 //routers
 import songRouter from "./songRouter";
 
+//heartbeat
+import sendHeartbeat from "./sendHeartbeat";
+
 const app = express();
 
 app.use(express.json());
@@ -28,9 +31,14 @@ mongoose
   .connect(process.env.MONGO_URI as string)
   .then(() => {
     app.listen(process.env.PORT, () => {
-      console.log(`Example song service node listening at http://localhost:${process.env.PORT}`);
+      console.log(
+        `Example song service node listening at http://localhost:${process.env.PORT}`
+      );
     });
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.log(err);
   });
+
+// Send a heartbeat every 5 seconds
+setInterval(sendHeartbeat, 5000);

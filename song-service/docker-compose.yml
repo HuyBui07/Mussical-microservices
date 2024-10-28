@@ -5,10 +5,10 @@ services:
     build: .
     ports:
       - "5002:5001"
+    env_file:
+      - .env
     environment:
-      - PORT=5001
-      - MONGO_URI=mongodb://mongo:27017/song-service
-      - SECRET_KEY=secretkey
+      - SERVICE_ID=service1
     depends_on:
       - mongo
 
