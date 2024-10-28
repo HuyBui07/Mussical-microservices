@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "g5+FqNPakK56cqBVcoai4UopvhhMpYmd3/Xe8GBzugI=",
+  "Source": "authenticate-service",
+  "BasePath": "_content/authenticate-service",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
