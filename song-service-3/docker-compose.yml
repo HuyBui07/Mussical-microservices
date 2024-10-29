@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "5004:5001"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_ID=service3
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
