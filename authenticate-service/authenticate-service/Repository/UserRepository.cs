@@ -73,5 +73,10 @@ namespace authenticate_service.Repository
             var hash = HashPassword(password);
             return hash == hashedPassword;
         }
+
+        public async Task<bool> PingAsync()
+        {
+            return await Task.FromResult(true);
+        }
     }
 }
