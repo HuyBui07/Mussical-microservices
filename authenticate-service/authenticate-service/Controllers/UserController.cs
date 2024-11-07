@@ -69,5 +69,29 @@ namespace authenticate_service.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        // Ping endpoint to check health
+        [HttpGet("ping")]
+        public async Task<IActionResult> Ping()
+        {
+            try
+            {
+                var isHealthy = await _userRepository.PingAsync();
+                //await Task.Delay(TimeSpan.FromSeconds(15)); // Simulate delay
+
+                if (isHealthy)
+                {
+                    return Ok("Service is running");
+                }
+                else
+                {
+                    return StatusCode(500, "Service unavailable");
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Service timeout or error");
+            }
+        }
     }
 }

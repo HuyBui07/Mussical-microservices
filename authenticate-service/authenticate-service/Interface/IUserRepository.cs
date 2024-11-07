@@ -12,5 +12,6 @@ namespace authenticate_service.Interface
         Task<User> LoginAsync(string email, string password);
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByIdAsync(Guid id);
+        Task<bool> PingAsync();
     }
 }

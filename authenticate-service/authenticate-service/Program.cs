@@ -7,8 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using authenticate_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Add monitor
+builder.Services.AddHttpClient(); // Required for IHttpClientFactory
+builder.Services.AddHostedService<MonitoringService>(); // Registers the MonitoringService
 
 // Add services to the container.
 builder.Services.AddControllers();
