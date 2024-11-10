@@ -10,6 +10,7 @@ services:
       - .env
     environment:
       - SERVICE_ID=service1
+      - PEERS=service2,service3
     depends_on:
       - mongo
 

@@ -2,6 +2,9 @@ import express, { json } from "express";
 import chalk from "chalk";
 import dotenv from "dotenv";
 
+// state
+import { state } from "./state";
+
 dotenv.config();
 
 const app = express();
@@ -74,13 +77,16 @@ let service3IntervalId = setInterval(
 
 // Route to handle heartbeat POST requests
 app.post("/heartbeat", (req, res) => {
-  const { source }: { source: string } = req.body;
+  const { source, isLeader }: { source: string; isLeader: boolean } = req.body;
   heartbeatLastReceived[source] = Date.now();
-  console.info(
+  if (isLeader) {
+    state.leaderId = source;
+  }
+  const infoMessage =
     `Received heartbeat from ${source} at ${new Date(
       heartbeatLastReceived[source]
-    ).toLocaleTimeString()}`
-  );
+    ).toLocaleTimeString()}` + (isLeader ? " as the leader." : "");
+  console.info(infoMessage);
 
   // If the status was down, send an alert that the source is back up
   if (!sourceLiveStatus[source]) {
@@ -137,6 +143,40 @@ app.post("/heartbeat", (req, res) => {
   }
 
   res.status(200).send("Heartbeat received");
+});
+
+// Route to get the leader
+
+const serviceUrls: { [key: string]: string } = {
+  service1: process.env.SERVICE_1_URL as string,
+  service2: process.env.SERVICE_2_URL as string,
+  service3: process.env.SERVICE_3_URL as string,
+};
+
+app.get("/leaderForWriting", (req, res) => {
+  let leaderUrl = null;
+  if (state.leaderId == "service1") {
+    leaderUrl = serviceUrls.service1;
+  } else if (state.leaderId == "service2") {
+    leaderUrl = serviceUrls.service2;
+  } else if (state.leaderId == "service3") {
+    leaderUrl = serviceUrls.service3;
+  }
+  res.json({ leaderUrl: leaderUrl });
+});
+
+let lastUsedService = "";
+app.get("/availableServiceForReading", (req, res) => {
+  let availableServiceUrl;
+  for (const service in serviceUrls) {
+    if (service == state.leaderId) continue;
+    if (sourceLiveStatus[service] && service != lastUsedService) {
+      lastUsedService = service;
+      availableServiceUrl = serviceUrls[service];
+      break;
+    }
+  }
+  res.json({ availableServiceUrl: availableServiceUrl });
 });
 
 // Start the server
