@@ -2,7 +2,7 @@ import { Application, json } from "express";
 import chalk from "chalk";
 
 // state
-import { state } from "./raft/state";
+import { state } from "./constants/state";
 import { servicesLiveStatus } from "./constants/servicesState";
 
 // Alert function to send a message to a Slack channel

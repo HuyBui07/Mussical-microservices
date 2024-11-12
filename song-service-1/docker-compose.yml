@@ -11,13 +11,21 @@ services:
     environment:
       - SERVICE_ID=service1
       - PEERS=service2,service3
+      - MONGO_URI=mongodb://mongo:27017/song-service
     depends_on:
       - mongo
+    networks:
+      - backend1-network
 
   mongo:
     image: mongo:latest
     volumes:
       - mongo-data:/data/db
+    networks:
+      - backend1-network
+
+networks:
+  backend1-network:
 
 volumes:
   mongo-data:

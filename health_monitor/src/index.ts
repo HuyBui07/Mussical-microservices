@@ -1,13 +1,12 @@
-import express, { json } from "express";
 import dotenv from "dotenv";
+dotenv.config();
 
-// routers
-import balancerRouter from "./balancer/router";
+import express, { json } from "express";
+
 
 // heartbeat
 import { startHeartbeatProcess } from "./heartbeat";
 
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,8 +17,17 @@ app.use(json());
 // Start the heartbeat process and pass the app instance
 startHeartbeatProcess(app);
 
-// Mount the balancer router
-app.use("/balancer", balancerRouter);
+
+// app.use("/balancer", multerSongUploader, (req, res) => {
+//   console.log("req.body: ", req.body.tags);
+//   console.log("req.files: ", req.files);
+//   res.send("Hello from balancer");
+// })
+
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
 
 // Start the server
 app.listen(port, () => {
