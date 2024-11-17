@@ -10,6 +10,9 @@ import songRouter from "./songRouter";
 //heartbeat
 import sendHeartbeat from "./sendHeartbeat";
 
+//raft
+import raft from "./raft";
+
 const app = express();
 
 app.use(express.json());
@@ -26,6 +29,9 @@ app.use((req, res, next) => {
 });
 
 app.use("/", songRouter);
+
+// raft
+raft(app);
 
 mongoose
   .connect(process.env.MONGO_URI as string)

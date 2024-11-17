@@ -1,5 +1,26 @@
 import { Request, Response } from "express";
 import { state } from "./state";
+import startElection from "./election";
+
+// Store the timeout ID
+let heartbeatTimeout: NodeJS.Timeout | null = null;
+
+function handleHeartbeatFromLeader(req: Request, res: Response) {
+  // Clear the existing timeout if it exists
+  if (heartbeatTimeout) {
+    clearTimeout(heartbeatTimeout);
+  }
+
+  // Set a new timeout for 10 seconds
+  heartbeatTimeout = setTimeout(() => {
+    console.error("Leader heartbeat timeout. Starting new election.");
+    // Handle leader timeout (e.g., start a new election)
+    startElection();
+  }, 10000); // 10 seconds
+
+  console.log("Heartbeat received from leader. Timeout reset.");
+  res.status(200).send("Heartbeat received");
+}
 
 function handleVoteRequest(req: Request, res: Response) {
   const { term, candidateId } = req.body;
@@ -14,4 +35,5 @@ function handleVoteRequest(req: Request, res: Response) {
   }
 }
 
-export { handleVoteRequest };
+
+export { handleHeartbeatFromLeader, handleVoteRequest };

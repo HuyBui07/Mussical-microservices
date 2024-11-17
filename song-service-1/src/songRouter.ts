@@ -12,7 +12,6 @@ import {
   getRecentSongs,
   getForYouSongs,
 } from "./songController";
-import { handleVoteRequest } from "./raft/controllers";
 
 //middleware
 import { requireAuth } from "./middlewares/requireAuth";
@@ -45,8 +44,5 @@ router.get("/recommend", RecommendNextSong);
 router.get("/tags", getTags);
 router.get("/:song_id", getMetadataFromSongId);
 router.get("/:song_id/play", increaseListenCount);
-
-// Raft endpoints
-router.post("/vote", handleVoteRequest);
 
 export default router;
