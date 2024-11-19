@@ -2,9 +2,7 @@ import { Application } from "express";
 
 // Router
 import router from "./router";
-
-// controllers
-import { handleVoteRequest } from "./controllers";
+import startElection from "./election";
 
 function raft(app: Application) {
   app.use("/raft", router);

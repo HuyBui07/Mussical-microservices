@@ -13,7 +13,7 @@ export const state: State = {
   term: 0,
   votedFor: null,
   log: [],
-  leaderId: null,
-  isLeader: false,
+  leaderId: "service1",
+  isLeader: process.env.SERVICE_ID == "service1",
   peers: process.env.PEERS?.split(",") ?? [],
 };

@@ -5,24 +5,24 @@ services:
     image: song-service-backend:latest
     build: .
     ports:
-      - "5002:5001"
+      - "5004:5001"
     environment:
-      - SERVICE_ID=service1
-      - PEERS=service2,service3
+      - SERVICE_ID=service3
+      - PEERS=service1,service2
     depends_on:
       - mongo
     networks:
-      - backend1_network
+      - backend3_network
 
   mongo:
     image: mongo:latest
     volumes:
       - mongo-data:/data/db
     networks:
-      - backend1_network
+      - backend3_network
 
 networks:
-  backend1_network: 
+  backend3_network:
 
 volumes:
   mongo-data:

@@ -9,6 +9,8 @@ import songRouter from "./songRouter";
 
 //heartbeat
 import sendHeartbeat from "./sendHeartbeat";
+import { state } from "./raft/state";
+import { startHeartbeatProcess } from "./raft/heartbeat";
 
 //raft
 import raft from "./raft";
@@ -23,12 +25,7 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-  console.log(req.path, req.method);
-  next();
-});
-
-app.use("/", songRouter);
+app.use("/api", songRouter);
 
 // raft
 raft(app);
@@ -46,5 +43,5 @@ mongoose
     console.log(err);
   });
 
-// Send a heartbeat every 5 seconds
-setInterval(sendHeartbeat, 5000);
+// Send a heartbeat every 5 seconds if the node is the leader
+startHeartbeatProcess();

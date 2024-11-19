@@ -5,7 +5,7 @@ import { handleHeartbeatFromLeader, handleVoteRequest } from "./controllers";
 
 const router = express.Router();
 
-router.get("/heartbeat_from_leader", handleHeartbeatFromLeader);
+router.post("/heartbeat_from_leader", handleHeartbeatFromLeader);
 router.post("/vote", handleVoteRequest);
 
 
