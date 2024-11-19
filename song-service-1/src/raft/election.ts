@@ -10,22 +10,26 @@ async function startElection() {
     );
 
     state.term += 1;
-    state.votedFor = state.id;
-    let votes = 1;
+    if (state.votedFor) {
+      console.log(`Already voted for ${state.votedFor}`);
+      state.votedFor = null;
+      return;
+    }
+    let votes = 0;
 
     for (let peer of state.peers) {
       const peerUrl = serviceURLs[peer];
       const peerTerm = state.term;
       const candidateId = state.id;
       try {
-        const response = await fetch(`${peerUrl}/vote`, {
+        const response = await fetch(`${peerUrl}/raft/vote`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ peerTerm, candidateId }),
         });
         const data = await response.json();
         if (data.voteGranted) votes++;
-        if (votes > state.peers.length / 2) {
+        if (votes == state.peers.length / 2) {
           becomeLeader();
           break;
         }
@@ -33,7 +37,6 @@ async function startElection() {
         console.error(`Failed to get vote from ${peer}:`, error.message);
       }
     }
-
   }, randomTimeout);
 }
 

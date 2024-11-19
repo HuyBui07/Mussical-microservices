@@ -23,14 +23,14 @@ function handleHeartbeatFromLeader(req: Request, res: Response) {
     clearTimeout(heartbeatTimeout);
   }
 
-  // Set a new timeout for 10 seconds
+  // Set a new timeout 
   heartbeatTimeout = setTimeout(() => {
     console.error("Leader heartbeat timeout. Starting new election.");
     // Handle leader timeout (e.g., start a new election)
     startElection();
-  }, 10000); // 10 seconds
+  }, 15000); 
 
-  console.log("Heartbeat received from leader. Timeout reset.");
+  console.log(`Heartbeat received from leader ${leaderId}. Timeout reset.`);
   res.status(200).send("Heartbeat received");
 }
 
