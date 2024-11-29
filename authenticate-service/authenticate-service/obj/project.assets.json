@@ -4179,24 +4179,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\11toa\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\11toa\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\11toa\\Source\\Mussical-microservices\\authenticate-service\\authenticate-service\\authenticate-service.csproj",
+      "projectUniqueName": "C:\\Users\\11toa\\source\\Mussical_Microservice\\authenticate-service\\authenticate-service\\authenticate-service.csproj",
       "projectName": "authenticate-service",
-      "projectPath": "C:\\Users\\11toa\\Source\\Mussical-microservices\\authenticate-service\\authenticate-service\\authenticate-service.csproj",
+      "projectPath": "C:\\Users\\11toa\\source\\Mussical_Microservice\\authenticate-service\\authenticate-service\\authenticate-service.csproj",
       "packagesPath": "C:\\Users\\11toa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\11toa\\Source\\Mussical-microservices\\authenticate-service\\authenticate-service\\obj\\",
+      "outputPath": "C:\\Users\\11toa\\source\\Mussical_Microservice\\authenticate-service\\authenticate-service\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
         "C:\\Users\\11toa\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4280,7 +4275,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
