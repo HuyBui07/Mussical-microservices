@@ -10,12 +10,16 @@ async function startElection() {
     );
 
     state.term += 1;
+    let votes = 0;
     if (state.votedFor) {
       console.log(`Already voted for ${state.votedFor}`);
-      state.votedFor = null;
       return;
+    } else if (state.votedFor === state.id) {
+      votes++;
+    } else {
+      state.votedFor = state.id;
+      votes++;
     }
-    let votes = 0;
 
     for (let peer of state.peers) {
       const peerUrl = serviceURLs[peer];
@@ -29,7 +33,7 @@ async function startElection() {
         });
         const data = await response.json();
         if (data.voteGranted) votes++;
-        if (votes == state.peers.length / 2) {
+        if (votes > state.peers.length / 2) {
           becomeLeader();
           break;
         }

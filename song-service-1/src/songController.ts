@@ -4,53 +4,84 @@ import cloudinaryClient, { cloudinaryUploader } from "./cloudinary";
 //model
 import Song from "./models/songModel";
 import HistoryRecord from "./models/historyRecord";
+import { LogEntry } from "./models/logModel";
 
 // middleware
 import { PaginatedRequest } from "./middlewares/pagination";
 import { AuthRequest } from "./middlewares/requireAuth";
 
+// utils
+import { forwardLogEntry } from "./utils";
+
+// Raft State
+import { state } from "./raft/state";
+
 //create a new song
 export const createSong = async (req: Request, res: Response) => {
-  if (
-    !req.files ||
-    !("posterFile" in req.files) ||
-    !("sourceFile" in req.files)
-  ) {
-    res.status(400).json({ message: "Missing required files" });
-    return;
-  }
+  // if (
+  //   !req.files ||
+  //   !("posterFile" in req.files) ||
+  //   !("sourceFile" in req.files)
+  // ) {
+  //   res.status(400).json({ message: "Missing required files" });
+  //   return;
+  // }
 
-  // Extract the files
-  const posterFile = (req.files as any).posterFile[0];
-  const sourceFile = (req.files as any).sourceFile[0];
+  // // Extract the files
+  // const posterFile = (req.files as any).posterFile[0];
+  // const sourceFile = (req.files as any).sourceFile[0];
+
+  // try {
+  //   // Upload files to Cloudinary
+  //   const [posterResult, sourceResult] = await Promise.all([
+  //     cloudinaryUploader(posterFile.buffer, "posters"),
+  //     cloudinaryUploader(sourceFile.buffer, "songs"),
+  //   ]);
+
+  //   const posterUrl = posterResult.secure_url;
+  //   const sourceUrl = sourceResult.secure_url;
+  //   //Split with space for tags
+  //   let { tags } = req.body;
+
+  //   if (tags) {
+  //     tags = tags.split(" ");
+  //   }
+  //   const newSong = new Song({
+  //     title: req.body.title,
+  //     artist: req.body.artist,
+  //     poster: posterUrl,
+  //     source: sourceUrl,
+  //     tags: tags || [],
+  //   });
+  //   await newSong.save();
+  //   res.status(201).json(newSong);
+  // } catch (err: any) {
+  //   console.log("Create song error", err);
+  //   res.status(500).json({ message: err.message });
+  // }
 
   try {
-    // Upload files to Cloudinary
-    const [posterResult, sourceResult] = await Promise.all([
-      cloudinaryUploader(posterFile.buffer, "posters"),
-      cloudinaryUploader(sourceFile.buffer, "songs"),
-    ]);
+    state.latestLogIndex += 1;
 
-    const posterUrl = posterResult.secure_url;
-    const sourceUrl = sourceResult.secure_url;
-    //Split with space for tags
-    let { tags } = req.body;
-
-    if (tags) {
-      tags = tags.split(" ");
-    }
-    const newSong = new Song({
-      title: req.body.title,
-      artist: req.body.artist,
-      poster: posterUrl,
-      source: sourceUrl,
-      tags: tags || [],
+    const logEntry = new LogEntry({
+      method: req.method,
+      url: req.originalUrl,
+      headers: req.headers,
+      body: req.body,
+      status: "appended",
+      index: state.latestLogIndex,
+      term: state.term,
     });
-    await newSong.save();
-    res.status(201).json(newSong);
-  } catch (err: any) {
-    console.log("Create song error", err);
-    res.status(500).json({ message: err.message });
+
+    await logEntry.save();
+    forwardLogEntry(logEntry);
+    res.status(200).json({
+      message: "Song creation request logged",
+      logEntryId: logEntry._id,
+    });
+  } catch (error) {
+    console.error("Error logging song creation request:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -183,8 +214,8 @@ export const getMetadataFromSongId = async (req: Request, res: Response) => {
   try {
     const song = await Song.findById(song_id);
     if (!song) {
-       res.status(404).json({ message: "Song not found" });
-       return
+      res.status(404).json({ message: "Song not found" });
+      return;
     }
 
     res.status(200).json(song);
@@ -225,8 +256,8 @@ export const deleteSong = async (req: Request, res: Response) => {
   try {
     const song = await Song.findByIdAndDelete(song_id);
     if (!song) {
-        res.status(404).json({ message: "Song not found" });
-        return
+      res.status(404).json({ message: "Song not found" });
+      return;
     }
     //Call the cloudinary api to delete the poster and source
     const posterUrl = song?.poster;
@@ -441,7 +472,7 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
 //General idea: Check for tags first. If artist has similar tags, increase score. If the artist is the same, increase score
 //If the artist is the same, return the song
 export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
-    const user_id = req.user_id;
+  const user_id = req.user_id;
   const { song_id } = req.query;
   console.log("Recommend next song for song id: ", song_id);
 
@@ -453,7 +484,7 @@ export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
   console.log("Current song: ", song?._id);
   if (!song) {
     res.status(404).json({ message: "Song not found" });
-    return 
+    return;
   }
 
   try {

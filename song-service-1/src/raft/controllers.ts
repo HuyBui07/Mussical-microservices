@@ -28,7 +28,7 @@ function handleHeartbeatFromLeader(req: Request, res: Response) {
     console.error("Leader heartbeat timeout. Starting new election.");
     // Handle leader timeout (e.g., start a new election)
     startElection();
-  }, 15000); 
+  }, 20000); 
 
   console.log(`Heartbeat received from leader ${leaderId}. Timeout reset.`);
   res.status(200).send("Heartbeat received");
@@ -47,5 +47,11 @@ function handleVoteRequest(req: Request, res: Response) {
   }
 }
 
+function handleAppendEntry(req: Request, res: Response) {
+  const { term, leaderId, prevLogIndex, prevLogTerm, entries, leaderCommit } = req.body;
 
-export { handleHeartbeatFromLeader, handleVoteRequest };
+  console.log()
+}
+
+
+export { handleHeartbeatFromLeader, handleVoteRequest, handleAppendEntry };
