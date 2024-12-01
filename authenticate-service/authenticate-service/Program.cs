@@ -11,6 +11,7 @@ using authenticate_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 //Add monitor
 builder.Services.AddHttpClient(); // Required for IHttpClientFactory
 builder.Services.AddHostedService<MonitoringService>(); // Registers the MonitoringService
@@ -20,12 +21,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 
 builder.Services.AddDbContext<MyAppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
     
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
 // Get configuration from appsettings.json and environment variables
 var configuration = builder.Configuration;
 

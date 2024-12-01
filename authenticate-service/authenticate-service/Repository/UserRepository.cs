@@ -76,7 +76,17 @@ namespace authenticate_service.Repository
 
         public async Task<bool> PingAsync()
         {
-            return await Task.FromResult(true);
+            //return await Task.FromResult(true);
+            try
+            {
+                // Execute a lightweight query to check database connectivity
+                await _context.Database.ExecuteSqlRawAsync("SELECT 1");
+                return true;
+            }
+            catch
+            {
+                return false; // Return false if the query fails
+            }
         }
     }
 }
