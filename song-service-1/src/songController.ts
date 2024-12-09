@@ -10,26 +10,61 @@ import { LogEntry } from "./models/logModel";
 import { PaginatedRequest } from "./middlewares/pagination";
 import { AuthRequest } from "./middlewares/requireAuth";
 
-// utils
-import { forwardLogEntry } from "./utils";
-
 // Raft State
 import { state } from "./raft/state";
 
+// URLs
+import { serviceURLs } from "./raft/constants";
+
+// Function to forward log entries to peer nodes
+export const forwardLogEntry = async (logEntry: any) => {
+  const peers = process.env.PEERS?.split(",") || [];
+
+  const logEntryObject = logEntry.toObject();
+
+  delete logEntryObject._id;
+
+  for (const peer of peers) {
+    try {
+      const dest = serviceURLs[peer];
+      const response = await fetch(`${dest}/raft/appendEntry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ logEntry: logEntryObject }),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Failed to forward log entry to ${peer}: ${response.statusText}`
+        );
+      }
+
+      if (response.status == 201) {
+        // Update the latest log index
+        console.log(`Log entry forwarded to ${peer}`);
+      }
+    } catch (error) {
+      console.error(`Error forwarding log entry to ${peer}:`, error);
+    }
+  }
+};
+
 //create a new song
 export const createSong = async (req: Request, res: Response) => {
-  // if (
-  //   !req.files ||
-  //   !("posterFile" in req.files) ||
-  //   !("sourceFile" in req.files)
-  // ) {
-  //   res.status(400).json({ message: "Missing required files" });
-  //   return;
-  // }
+  if (
+    !req.files ||
+    !("posterFile" in req.files) ||
+    !("sourceFile" in req.files)
+  ) {
+    res.status(400).json({ message: "Missing required files" });
+    return;
+  }
 
-  // // Extract the files
-  // const posterFile = (req.files as any).posterFile[0];
-  // const sourceFile = (req.files as any).sourceFile[0];
+  // Extract the files
+  const posterFile = (req.files as any).posterFile[0];
+  const sourceFile = (req.files as any).sourceFile[0];
 
   // try {
   //   // Upload files to Cloudinary
@@ -61,24 +96,52 @@ export const createSong = async (req: Request, res: Response) => {
   // }
 
   try {
+    // Check if song already exists
+    const existingSong = await Song.findOne({
+      title: req.body.title,
+      artist: req.body.artist,
+    });
+
+    if (existingSong) {
+      res.status(400).json({ message: "Song already exists" });
+      return;
+    }
+
+    // Upload files to Cloudinary
+    const [posterResult, sourceResult] = await Promise.all([
+      cloudinaryUploader(posterFile.buffer, "posters"),
+      cloudinaryUploader(sourceFile.buffer, "songs"),
+    ]);
+
+    const posterUrl = posterResult.secure_url;
+    const sourceUrl = sourceResult.secure_url;
+
     state.latestLogIndex += 1;
+
+    const newBody = {
+      title: req.body.title,
+      artist: req.body.artist,
+      poster: posterUrl,
+      source: sourceUrl,
+      tags: req.body.tags || [],
+    };
 
     const logEntry = new LogEntry({
       method: req.method,
       url: req.originalUrl,
       headers: req.headers,
-      body: req.body,
+      body: newBody,
       status: "appended",
       index: state.latestLogIndex,
       term: state.term,
     });
 
     await logEntry.save();
-    forwardLogEntry(logEntry);
     res.status(200).json({
       message: "Song creation request logged",
       logEntryId: logEntry._id,
     });
+    forwardLogEntry(logEntry);
   } catch (error) {
     console.error("Error logging song creation request:", error);
     res.status(500).json({ error: "Internal server error" });
