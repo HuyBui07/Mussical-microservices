@@ -8,8 +8,6 @@ import mongoose from "mongoose";
 import songRouter from "./songRouter";
 
 //heartbeat
-import sendHeartbeat from "./sendHeartbeat";
-import { state } from "./raft/state";
 import { startHeartbeatProcess } from "./raft/heartbeat";
 
 //raft
@@ -38,6 +36,7 @@ mongoose
         `Example song service node listening at http://localhost:${process.env.PORT}`
       );
     });
+
   })
   .catch((err: any) => {
     console.log(err);

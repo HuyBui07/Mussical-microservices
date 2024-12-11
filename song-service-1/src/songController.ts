@@ -10,14 +10,19 @@ import { LogEntry } from "./models/logModel";
 import { PaginatedRequest } from "./middlewares/pagination";
 import { AuthRequest } from "./middlewares/requireAuth";
 
-// Raft State
+// Raft
 import { state } from "./raft/state";
+import { processLogEntry } from "./raft/processLogEntry";
 
 // URLs
 import { serviceURLs } from "./raft/constants";
 
+
+
 // Function to forward log entries to peer nodes
-export const forwardLogEntry = async (logEntry: any) => {
+const forwardLogEntry = async (logEntry: any) => {
+  let successfullyAppendedNotifications = 0;
+
   const peers = process.env.PEERS?.split(",") || [];
 
   const logEntryObject = logEntry.toObject();
@@ -44,10 +49,49 @@ export const forwardLogEntry = async (logEntry: any) => {
       if (response.status == 201) {
         // Update the latest log index
         console.log(`Log entry forwarded to ${peer}`);
+        successfullyAppendedNotifications++;
       }
     } catch (error) {
       console.error(`Error forwarding log entry to ${peer}:`, error);
     }
+  }
+
+  // If a majority of peers have appended the log entry, commit it
+  if (successfullyAppendedNotifications >= Math.ceil(peers.length / 2)) {
+    console.log("Log entry successfully appended by majority of peers");
+    logEntry.status = "committed";
+    await logEntry.save();
+
+    // Commit the log entry
+    processLogEntry(logEntry);
+
+    // Save song to database
+
+    // Send commit notification to peers
+      for (const peer of peers) {
+        try {
+          const dest = serviceURLs[peer];
+          const response = await fetch(`${dest}/raft/commitEntry`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ index: logEntry.index, term: logEntry.term }),
+          });
+
+          if (!response.ok) {
+            console.error(
+              `Failed to commit log entry to ${peer}: ${response.statusText}`
+            );
+          }
+
+          if (response.status == 201) {
+            console.log(`Log entry committed by ${peer}`);
+          }
+        } catch (error) {
+          console.error(`Error committing log entry to ${peer}:`, error);
+        }
+      }
   }
 };
 

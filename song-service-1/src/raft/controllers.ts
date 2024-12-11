@@ -2,6 +2,7 @@ import { LogEntry } from "./../models/logModel";
 import { Request, Response } from "express";
 import { state } from "./state";
 import startElection from "./election";
+import { processLogEntry } from "./processLogEntry";
 
 // Store the timeout ID
 let heartbeatTimeout: NodeJS.Timeout | null = null;
@@ -62,4 +63,34 @@ async function handleAppendEntry(req: Request, res: Response) {
   }
 }
 
-export { handleHeartbeatFromLeader, handleVoteRequest, handleAppendEntry };
+async function handleCommitEntry(req: Request, res: Response) {
+  const { index, term } = req.body;
+  try {
+    const logEntry = await LogEntry.findOne({ index, term });
+
+    if (!logEntry) {
+      console.error(`Log entry not found for index ${index} and term ${term}`);
+      res.status(404).send("Log entry not found");
+      return;
+    }
+
+    logEntry.status = "committed";
+
+    processLogEntry(logEntry);
+
+    await logEntry.save();
+
+    console.log(`Log entry committed: ${logEntry}`);
+    res.status(200).send("Log entry committed");
+  } catch (error) {
+    console.error("Error handling commit entry:", error);
+    res.status(500).send("Error handling commit entry");
+  }
+}
+
+export {
+  handleHeartbeatFromLeader,
+  handleVoteRequest,
+  handleAppendEntry,
+  handleCommitEntry,
+};

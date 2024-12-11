@@ -25,6 +25,11 @@ const proxy = createProxyMiddleware({
 
 app.use("/proxy", proxy);
 
+app.use("/", (req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
 // Endpoint for chaning the leader
 app.get("/change-leader", (req, res) => {
   const [source] = req.body;
