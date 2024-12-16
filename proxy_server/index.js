@@ -10,7 +10,7 @@ const target = "http://localhost:5002";
 const proxy = createProxyMiddleware({
   target: target,
   changeOrigin: true,
-  timeout: 10000,
+  timeout: 30000,
   pathRewrite: {
     [`^/proxy`]: "",
   },

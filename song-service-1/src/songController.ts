@@ -95,6 +95,7 @@ const forwardLogEntry = async (logEntry: any) => {
   }
 };
 
+
 //create a new song
 export const createSong = async (req: Request, res: Response) => {
   if (
@@ -180,11 +181,13 @@ export const createSong = async (req: Request, res: Response) => {
       term: state.term,
     });
 
-    await logEntry.save();
+    const savedLogEntry = await logEntry.save();
+
     res.status(200).json({
       message: "Song creation request logged",
-      logEntryId: logEntry._id,
+      logEntryId: savedLogEntry._id,
     });
+    
     forwardLogEntry(logEntry);
   } catch (error) {
     console.error("Error logging song creation request:", error);
