@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "g5+FqNPakK56cqBVcoai4UopvhhMpYmd3/Xe8GBzugI=",
+  "Hash": "S/pr2KG6W9hNSxMCfGpp65zg1D9k7rKXhMjXRlMHIlM=",
   "Source": "authenticate-service",
   "BasePath": "_content/authenticate-service",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

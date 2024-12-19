@@ -1,44 +1,34 @@
 using authenticate_service.Data;
 using authenticate_service.Interface;
 using authenticate_service.Repository;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using authenticate_service.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Add monitor
-builder.Services.AddHttpClient(); // Required for IHttpClientFactory
-builder.Services.AddHostedService<MonitoringService>(); // Registers the MonitoringService
+// Set the initial database connection
+Environment.SetEnvironmentVariable("CurrentDatabaseConnection", builder.Configuration.GetSection("DatabaseSettings:PrimaryConnectionString").Value);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Bind DatabaseSettings
+builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("DatabaseSettings"));
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
+// Add DbContext
+builder.Services.AddDbContext<MyAppDbContext>();
 
-builder.Services.AddDbContext<MyAppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-    
+// Add services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// Get configuration from appsettings.json and environment variables
-var configuration = builder.Configuration;
+builder.Services.AddHttpClient();
+builder.Services.AddHostedService<MonitoringService>();
 
 // Add JWT authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
-        var jwtKey = configuration["Jwt:Key"];
-        if (string.IsNullOrEmpty(jwtKey))
-        {
-            throw new ArgumentNullException("Jwt:Key", "The JWT Key must be set in configuration");
-        }
-
+        var jwtKey = builder.Configuration["Jwt:Key"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -48,15 +38,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Configure HTTPS Redirection (set the port explicitly)
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.HttpsPort = 7039; // Set the port explicitly
-});
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// // Configure HTTPS Redirection (set the port explicitly)
+// builder.Services.AddHttpsRedirection(options =>
+// {
+//     options.HttpsPort = 7039; // Set the port explicitly
+// });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -64,15 +57,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
+app.UseHttpsRedirection();
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
