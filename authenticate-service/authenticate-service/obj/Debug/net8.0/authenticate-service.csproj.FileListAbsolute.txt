@@ -429,3 +429,6 @@ C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-se
 C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\obj\Debug\net8.0\authenticate-service.pdb
 C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\obj\Debug\net8.0\authenticate-service.genruntimeconfig.cache
 C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\obj\Debug\net8.0\ref\authenticate-service.dll
+C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\bin\Debug\net8.0\authenticate-service.staticwebassets.endpoints.json
+C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\11toa\source\Mussical_Microservice\authenticate-service\authenticate-service\obj\Debug\net8.0\staticwebassets\msbuild.authenticate-service.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
