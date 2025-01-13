@@ -10,14 +10,20 @@ let heartbeatTimeout: NodeJS.Timeout | null = null;
 function handleHeartbeatFromLeader(req: Request, res: Response) {
   const { leaderId, term } = req.body;
 
-  if (state.leaderId !== leaderId) {
-    console.log(`Leader updated to ${leaderId}`);
-    state.leaderId = leaderId;
+  if (state.term > term) {
+    console.log(`Received heartbeat from outdated leader. Ignoring.`);
+    res.status(409).json({ message: "Outdated leader. Heartbeat ignored." });
+    return;
   }
 
-  if (state.term !== term) {
+  if (state.term < term) {
     console.log(`Term updated to ${term}`);
     state.term = term;
+
+    if (state.leaderId !== leaderId) {
+      console.log(`Leader updated to ${leaderId}`);
+      state.leaderId = leaderId;
+    }
   }
 
   // Clear the existing timeout if it exists

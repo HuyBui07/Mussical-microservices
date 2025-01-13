@@ -53,7 +53,7 @@ async function becomeLeader() {
   startHeartbeatProcess();
 
   try {
-    await fetch(process.env.BALANCER_URL as string, {
+    await fetch(process.env.BALANCER_URL as string + "/change-leader", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ source: state.id }),

@@ -22,7 +22,7 @@ async function sendHeartbeatWithRetry(peerUrl: string, retries: number) {
   const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   try {
-    await fetch(`${peerUrl}/raft/heartbeat_from_leader`, {
+    const response = await fetch(`${peerUrl}/raft/heartbeat_from_leader`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -31,6 +31,12 @@ async function sendHeartbeatWithRetry(peerUrl: string, retries: number) {
       } as Heartbeat),
       signal: controller.signal,
     });
+
+    if (response.status == 409) {
+      console.log("I'm outdated. Updating leader and term from new leader's heartbeat later.");
+      state.isLeader = false;
+      state.leaderId = null;
+    }
     clearTimeout(timeoutId);
   } catch (error: any) {
     clearTimeout(timeoutId);

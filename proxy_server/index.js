@@ -49,6 +49,23 @@ app.get("/change-leader", (req, res) => {
   }
 });
 
+// End point for getting the current target
+app.get("/current-leader", (req, res) => {
+  let currentLeader;
+  switch (proxy.target) {
+    case "http://localhost:5002":
+      currentLeader = "service1";
+      break;
+    case "http://localhost:5003":
+      currentLeader = "service2";
+      break;
+    case "http://localhost:5004":
+      currentLeader = "service3";
+      break;
+  }
+  res.status(200).send(currentLeader);
+});
+
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();

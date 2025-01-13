@@ -65,7 +65,7 @@ const forwardLogEntry = async (logEntry: any) => {
     // Commit the log entry
     processLogEntry(logEntry);
 
-    // Save song to database
+    // TODO: Save song to database
 
     // Send commit notification to peers
       for (const peer of peers) {
