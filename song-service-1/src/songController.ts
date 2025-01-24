@@ -16,8 +16,54 @@ import { processLogEntry } from "./raft/processLogEntry";
 
 // URLs
 import { serviceURLs } from "./raft/constants";
+import { log } from "console";
 
+// Function to update the follower's log
+const updatingFollowerLog = async (logEntry: any, dest: string) => {
+  const logEntryObject = logEntry.toObject();
 
+  delete logEntryObject._id;
+
+  const response = await fetch(`${dest}/raft/appendEntry`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      logEntry: logEntryObject,
+      prevLogState: {
+        term: logEntryObject.term,
+        index: logEntryObject.index,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    console.error(
+      `Failed to update log entry for ${dest}: ${response.statusText}`
+    );
+  }
+
+  if (response.status == 409) {
+    console.log(`Log entry rejected by ${dest}: outdated log`);
+
+    const nextPrevLogEntry = await LogEntry.findOne({
+      index: logEntry.index - 1,
+    });
+
+    await updatingFollowerLog(nextPrevLogEntry, dest);
+  }
+
+  if (response.status == 201) {
+    console.log(`Log entry updated for ${dest}`);
+
+    const nextLogEntry = await LogEntry.findOne({
+      index: logEntry.index + 1,
+    }) as any;
+
+    await updatingFollowerLog(nextLogEntry, dest);
+  }
+};
 
 // Function to forward log entries to peer nodes
 const forwardLogEntry = async (logEntry: any) => {
@@ -37,13 +83,29 @@ const forwardLogEntry = async (logEntry: any) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ logEntry: logEntryObject }),
+        body: JSON.stringify({
+          logEntry: logEntryObject,
+          prevLogState: {
+            term: state.term,
+            index: state.latestLogIndex - 1,
+          },
+        }),
       });
 
       if (!response.ok) {
         console.error(
           `Failed to forward log entry to ${peer}: ${response.statusText}`
         );
+      }
+
+      // The follower does not have the latest log entry
+      if (response.status == 409) {
+        console.log(`Log entry rejected by ${peer}: outdated log`);
+        const prevLogEntry = await LogEntry.findOne({
+          index: state.latestLogIndex - 1,
+        });
+
+        await updatingFollowerLog(prevLogEntry, dest);
       }
 
       if (response.status == 201) {
@@ -65,36 +127,33 @@ const forwardLogEntry = async (logEntry: any) => {
     // Commit the log entry
     processLogEntry(logEntry);
 
-    // TODO: Save song to database
-
     // Send commit notification to peers
-      for (const peer of peers) {
-        try {
-          const dest = serviceURLs[peer];
-          const response = await fetch(`${dest}/raft/commitEntry`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ index: logEntry.index, term: logEntry.term }),
-          });
+    for (const peer of peers) {
+      try {
+        const dest = serviceURLs[peer];
+        const response = await fetch(`${dest}/raft/commitEntry`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ index: logEntry.index, term: logEntry.term }),
+        });
 
-          if (!response.ok) {
-            console.error(
-              `Failed to commit log entry to ${peer}: ${response.statusText}`
-            );
-          }
-
-          if (response.status == 201) {
-            console.log(`Log entry committed by ${peer}`);
-          }
-        } catch (error) {
-          console.error(`Error committing log entry to ${peer}:`, error);
+        if (!response.ok) {
+          console.error(
+            `Failed to commit log entry to ${peer}: ${response.statusText}`
+          );
         }
+
+        if (response.status == 201) {
+          console.log(`Log entry committed by ${peer}`);
+        }
+      } catch (error) {
+        console.error(`Error committing log entry to ${peer}:`, error);
       }
+    }
   }
 };
-
 
 //create a new song
 export const createSong = async (req: Request, res: Response) => {
@@ -187,7 +246,7 @@ export const createSong = async (req: Request, res: Response) => {
       message: "Song creation request logged",
       logEntryId: savedLogEntry._id,
     });
-    
+
     forwardLogEntry(logEntry);
   } catch (error) {
     console.error("Error logging song creation request:", error);

@@ -57,9 +57,24 @@ function handleVoteRequest(req: Request, res: Response) {
 
 async function handleAppendEntry(req: Request, res: Response) {
   try {
+    const prevLogState = req.body.prevLogState;
+
+    if (prevLogState.index != state.latestLogIndex) {
+      console.error(
+        `Previous log state index ${prevLogState.index} does not match latest log index ${state.latestLogIndex}`
+      );
+      res.status(409).send("Previous log state does not match");
+      return;
+    }
+
     const logEntry = new LogEntry(req.body.logEntry);
 
     await logEntry.save();
+    state.latestLogIndex = logEntry.index;
+
+    if (logEntry.status === "committed") {
+      processLogEntry(logEntry);
+    }
 
     console.log(`Log entry saved: ${logEntry}`);
     res.status(201).send("Log entry saved");
