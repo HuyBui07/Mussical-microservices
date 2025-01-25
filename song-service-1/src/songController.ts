@@ -24,6 +24,13 @@ const updatingFollowerLog = async (logEntry: any, dest: string) => {
 
   delete logEntryObject._id;
 
+  const prevLogEntry = await LogEntry.findOne({
+    index: logEntry.index - 1,
+  });
+
+  const latestTerm = prevLogEntry?.term || 0;
+  const latestLogIndex = prevLogEntry?.index || 0;
+
   const response = await fetch(`${dest}/raft/appendEntry`, {
     method: "POST",
     headers: {
@@ -32,8 +39,8 @@ const updatingFollowerLog = async (logEntry: any, dest: string) => {
     body: JSON.stringify({
       logEntry: logEntryObject,
       prevLogState: {
-        term: logEntryObject.term,
-        index: logEntryObject.index,
+        term: latestTerm,
+        index: latestLogIndex,
       },
     }),
   });
@@ -51,15 +58,19 @@ const updatingFollowerLog = async (logEntry: any, dest: string) => {
       index: logEntry.index - 1,
     });
 
+    console.log(
+      "Follower does not have the latest log entry, sending logentry index: ",
+      nextPrevLogEntry?.index
+    );
     await updatingFollowerLog(nextPrevLogEntry, dest);
   }
 
   if (response.status == 201) {
     console.log(`Log entry updated for ${dest}`);
 
-    const nextLogEntry = await LogEntry.findOne({
+    const nextLogEntry = (await LogEntry.findOne({
       index: logEntry.index + 1,
-    }) as any;
+    })) as any;
 
     await updatingFollowerLog(nextLogEntry, dest);
   }
@@ -105,6 +116,10 @@ const forwardLogEntry = async (logEntry: any) => {
           index: state.latestLogIndex - 1,
         });
 
+        console.log(
+          "Follower does not have the latest log entry, sending logentry index: ",
+          prevLogEntry?.index
+        );
         await updatingFollowerLog(prevLogEntry, dest);
       }
 

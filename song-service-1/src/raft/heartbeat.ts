@@ -47,8 +47,7 @@ async function sendHeartbeatWithRetry(peerUrl: string, retries: number) {
       await sendHeartbeatWithRetry(peerUrl, retries - 1);
     } else {
       console.error(
-        `Failed to send heartbeat to ${peerUrl} after multiple attempts:`,
-        error
+        `Failed to send heartbeat to ${peerUrl} after multiple attempts.`,
       );
     }
   }

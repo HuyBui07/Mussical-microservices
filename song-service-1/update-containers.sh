@@ -30,7 +30,7 @@ update_and_recreate() {
   echo "Updating and recreating containers for project: $project_name"
 
   # Recreate the containers
-  docker-compose -f $compose_file -p $project_name up --force-recreate -d
+  docker-compose -f $compose_file -p $project_name create --force-recreate 
 
   echo "Containers for project $project_name have been updated and recreated."
 }
