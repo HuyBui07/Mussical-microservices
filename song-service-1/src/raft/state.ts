@@ -1,3 +1,5 @@
+import { LogEntry } from "../models/logModel";
+
 type State = {
   id: string;
   term: number;
@@ -17,3 +19,10 @@ export const state: State = {
   isLeader: process.env.SERVICE_ID == "service1",
   peers: process.env.PEERS?.split(",") ?? [],
 };
+
+export async function initializeState() {
+  // Get the latest log index
+  const latestLogEntry = await LogEntry.find().sort({ index: -1 }).limit(1);
+  state.latestLogIndex = latestLogEntry.length > 0 ? latestLogEntry[0].index : 0;
+  state.term = latestLogEntry.length > 0 ? latestLogEntry[0].term : 0;
+}

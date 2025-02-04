@@ -12,6 +12,7 @@ import { startHeartbeatProcess } from "./raft/heartbeat";
 
 //raft
 import raft from "./raft";
+import { state } from "./raft/state";
 
 const app = express();
 
@@ -36,7 +37,6 @@ mongoose
         `Example song service node listening at http://localhost:${process.env.PORT}`
       );
     });
-
   })
   .catch((err: any) => {
     console.log(err);
@@ -44,3 +44,15 @@ mongoose
 
 // Send a heartbeat every 5 seconds if the node is the leader
 startHeartbeatProcess();
+
+// Get current leader state
+const getLeaderState = async () => {
+  const response = await fetch(
+    (process.env.BALANCER_URL as string) + "/current-leader"
+  );
+
+  const data = await response.json();
+
+  state.leaderId = data;
+  state.isLeader = data === state.id;
+};

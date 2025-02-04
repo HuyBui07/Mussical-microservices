@@ -1,5 +1,5 @@
 ☐ *Implement the recover aspect of Raft algo*
-    ☐ service update its logs after recovering from a crash.
+    ✔ service update its logs after recovering from a crash. one(25-02-02 11:39)
     ☐ service step down from leader to follower if it receives a request with a term greater than its current term.
 
 ☐ *Decide which service is the leader*
@@ -8,6 +8,8 @@
 ☐ *Implement simple frontend application to test*
     ☐ create a simple frontend application to test the service.
 
-
+☐ *Tests*
+    ☐ Update logs and update songs after failure.
+    ☐ Step down from leader to follower if it receives a request with a term greater than its current term.
 # Questions
 
