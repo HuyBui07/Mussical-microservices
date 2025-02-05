@@ -4,35 +4,45 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express();
 const PORT = 4000;
 
-// Proxy
-const target = "http://localhost:5002";
+// Proxy default leader
+let currentTarget = "http://localhost:5002";
 
-const proxy = createProxyMiddleware({
-  target: target,
-  changeOrigin: true,
-  timeout: 30000,
-  pathRewrite: {
-    [`^/proxy`]: "",
-  },
-  on: {
-    req: (proxyReq, req, res) => {},
-    error: (err, req, res) => {
-      console.error(err);
-      res.status(500).send("Something went wrong!");
+// Function to create a new proxy middleware with the updated target
+const createProxy = (target) => {
+  return createProxyMiddleware({
+    target: target,
+    changeOrigin: true,
+    timeout: 30000,
+    pathRewrite: {
+      [`^/proxy`]: "",
     },
-  },
+    on: {
+      req: (proxyReq, req, res) => {},
+      error: (err, req, res) => {
+        console.error(err);
+        res.status(500).send("Something went wrong!");
+      },
+    },
+  });
+};
+
+// Create initial proxy middleware
+let proxy = createProxy(currentTarget);
+
+app.use("/proxy", (req, res, next) => {
+  proxy(req, res, next);
 });
 
-app.use("/proxy", proxy);
+app.use(express.json());
 
 app.use("/", (req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
 });
 
-// Endpoint for chaning the leader
-app.get("/change-leader", (req, res) => {
-  const [source] = req.body;
+// Endpoint for changing the leader
+app.post("/change-leader", (req, res) => {
+  const { source } = req.body;
   let newTarget;
   if (source === "service1") {
     newTarget = "http://localhost:5002";
@@ -42,17 +52,18 @@ app.get("/change-leader", (req, res) => {
     newTarget = "http://localhost:5004";
   }
   if (newTarget) {
-    proxy.target = newTarget;
+    currentTarget = newTarget;
+    proxy = createProxy(newTarget); // Create a new proxy middleware with the updated target
     res.send(`Target has been changed to ${newTarget}`);
   } else {
-    res.status(400).send("Please provide a target");
+    res.status(400).send("Please provide a valid target");
   }
 });
 
-// End point for getting the current target
+// Endpoint for getting the current target
 app.get("/current-leader", (req, res) => {
   let currentLeader;
-  switch (proxy.target) {
+  switch (currentTarget) {
     case "http://localhost:5002":
       currentLeader = "service1";
       break;
@@ -62,16 +73,12 @@ app.get("/current-leader", (req, res) => {
     case "http://localhost:5004":
       currentLeader = "service3";
       break;
+    default:
+      currentLeader = "unknown";
   }
-  res.status(200).send(currentLeader);
+  res.send(currentLeader);
 });
 
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
-
-// Start the server
 app.listen(PORT, () => {
-  console.log(`Proxy server is running on port ${PORT}`);
+  console.log(`Proxy server listening at http://localhost:${PORT}`);
 });

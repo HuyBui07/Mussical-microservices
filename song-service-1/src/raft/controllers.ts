@@ -65,7 +65,7 @@ async function handleAppendEntry(req: Request, res: Response) {
 
     if (prevLogState.index != latestLogIndex) {
       console.error(
-        `Previous log state index ${prevLogState.index} does not match latest log index ${state.latestLogIndex}`
+        `Previous log state index ${prevLogState.index} does not match latest log index ${latestLogIndex}`
       );
       res.status(409).send("Previous log state does not match");
       return;

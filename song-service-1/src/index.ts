@@ -51,8 +51,12 @@ const getLeaderState = async () => {
     (process.env.BALANCER_URL as string) + "/current-leader"
   );
 
-  const data = await response.json();
+  const data = await response.text();
+  
+  console.log("Leader state: ", data);
 
   state.leaderId = data;
   state.isLeader = data === state.id;
 };
+
+getLeaderState();
