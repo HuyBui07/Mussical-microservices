@@ -6,6 +6,8 @@ const PORT = 4000;
 
 // Proxy default leader
 let currentTarget = "http://localhost:5002";
+let sideService1 = "http://localhost:5003";
+let sideService2 = "http://localhost:5004";
 
 // Function to create a new proxy middleware with the updated target
 const createProxy = (target) => {
@@ -28,9 +30,18 @@ const createProxy = (target) => {
 
 // Create initial proxy middleware
 let proxy = createProxy(currentTarget);
+let sideProxy1 = createProxy(sideService1);
+let sideProxy2 = createProxy(sideService2);
 
+let counter = 0;
 app.use("/proxy", (req, res, next) => {
-  proxy(req, res, next);
+  if (req.method === "GET") {
+    const proxies = [sideProxy1, sideProxy2];
+    
+    proxies[counter % proxies.length](req, res, next);
+    console.log(`Request sent to ${counter % proxies.length + 1}`);
+    counter++;
+  } else proxy(req, res, next);
 });
 
 app.use(express.json());

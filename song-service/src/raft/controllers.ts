@@ -1,4 +1,4 @@
-import { LogEntry } from "./../models/logModel";
+import { LogEntry } from "../models/logModel";
 import { Request, Response } from "express";
 import { state } from "./state";
 import startElection from "./election";

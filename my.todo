@@ -1,6 +1,6 @@
 ☐ *Implement the recover aspect of Raft algo*
     ✔ service update its logs after recovering from a crash. one(25-02-02 11:39)
-    ☐ service step down from leader to follower if it receives a request with a term greater than its current term.
+    ✔ service step down from leader to follower if it receives a request with a term greater than its current term. @done(25-02-06 11:16)
 
 ☐ *Decide which service is the leader*
     ☐ research about how can we gets the current machine specs.

@@ -291,6 +291,7 @@ export const getAllSongs = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 //Get songs , based on creation date
 export const getRecentSongs = async (req: Request, res: Response) => {
   const { page, limit } = (req as PaginatedRequest).pagination;
@@ -464,6 +465,7 @@ export const deleteSong = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 //Return all tag by scanning Songs
 export const getTags = async (req: Request, res: Response) => {
   try {
@@ -644,83 +646,4 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
   }
 };
 
-//Receive song id of a song user has just listened to
-//Return 1 song id (not the current song id)
-//Note : Must not return the current song id
-//Process: Get first tag of the current song and artist
-//Give score to each song based on the number of tags and artist match
-//Increase score if the song has the same tag or artist
-//Use user history
-//With each song in history that has the same tag, increase the score. Increase 10X if the artist is the same (must be the same song)
-//Return the song with the highest score
-//General idea: Check for tags first. If artist has similar tags, increase score. If the artist is the same, increase score
-//If the artist is the same, return the song
-export const RecommendNextSong = async (req: AuthRequest, res: Response) => {
-  const user_id = req.user_id;
-  const { song_id } = req.query;
-  console.log("Recommend next song for song id: ", song_id);
 
-  //Value to adjust for influence of tags and artist
-  const tagWeight = 2.5;
-  const artistWeight = 1;
-
-  const song = await Song.findById(song_id);
-  console.log("Current song: ", song?._id);
-  if (!song) {
-    res.status(404).json({ message: "Song not found" });
-    return;
-  }
-
-  try {
-    const currentTags = song.tags;
-    const currentArtist = song.artist;
-    const history = await HistoryRecord.find({ userId: user_id }).exec();
-    //Map song id to score
-    const scoreMap = new Map<string, number>();
-    for (const record of history) {
-      if (record.songId.toString() === song_id) {
-        continue; // Skip the current song in history
-      }
-      //If song doesn't exist, skip (might be deleted)
-      if (!(await Song.findById(record.songId))) continue;
-
-      const song = await Song.findById(record.songId);
-      if (!song) continue;
-      const tags = song.tags;
-      const artist = song.artist;
-      //Calculate score
-      let score = 0;
-      //Check tags
-      for (const tag of tags) {
-        if (currentTags.includes(tag)) {
-          score += tagWeight;
-        }
-      }
-      //Check artist
-      if (currentArtist === artist) {
-        score += artistWeight;
-      }
-      //Increase score if the song has the same tag or artist
-      if (tags.includes(currentTags[0])) {
-        score += tagWeight;
-      }
-      if (artist === currentArtist) {
-        score += artistWeight;
-      }
-      //Add to score map
-      const currentScore = scoreMap.get(record.songId) ?? 0;
-      scoreMap.set(record.songId, currentScore + score);
-    }
-    //Sort by score
-    const sortedScore = Array.from(scoreMap).sort((a, b) => b[1] - a[1]);
-    console.log("Sorted score: ", sortedScore);
-    //Return the song with the highest score
-    const nextSongId = sortedScore[0][0];
-    const songResult = await Song.findById(nextSongId);
-    console.log("Recommended song: ", songResult);
-    res.status(200).json(songResult);
-  } catch (err: any) {
-    console.log("Recommend next song error", err);
-    res.status(500).json({ message: err.message });
-  }
-};

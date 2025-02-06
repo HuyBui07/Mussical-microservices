@@ -8,7 +8,6 @@ import {
   updateSong,
   getThisMonthStats,
   getTags,
-  RecommendNextSong,
   getRecentSongs,
   getForYouSongs,
 } from "./songController";
@@ -35,12 +34,12 @@ router.put("/:song_id", checkIsManager, updateSong);
 router.delete("/:song_id", checkIsManager, deleteSong);
 
 //For normal users
-router.use(requireAuth);
+// test
+// router.use(requireAuth);
 
 router.get("/all", assignPagination, getAllSongs);
 router.get("/recent", assignPagination, getRecentSongs);
 router.get("/for-you", assignPagination, getForYouSongs);
-router.get("/recommend", RecommendNextSong);
 router.get("/tags", getTags);
 router.get("/:song_id", getMetadataFromSongId);
 router.get("/:song_id/play", increaseListenCount);
