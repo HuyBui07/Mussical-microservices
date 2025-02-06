@@ -1,7 +1,6 @@
 import config from "../Config";
 import ClientLayout from "../Layout/ClientLayout";
 import EmptyLayout from "../Layout/EmptyLayout";
-import Explore from "../Pages/Clients/Explore";
 import Home from "../Pages/Clients/Home";
 import Login from "../Pages/Common/Login";
 import Playlist from "../Pages/Clients/Playlist";
@@ -17,7 +16,6 @@ const publicRoutes = [
   { path: config.routes.login, component: Login, layout: EmptyLayout },
   { path: config.routes.register, component: Register, layout: EmptyLayout },
   { path: config.routes.home, component: Home, layout: ClientLayout },
-  { path: config.routes.explore, component: Explore, layout: ClientLayout },
   {
     path: config.routes.statistics,
     component: Statistic,

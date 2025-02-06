@@ -4,7 +4,6 @@ import { useState } from "react";
 import axios from "axios";
 import ConfirmPopup from "./UtilComponents/ConfirmPopup";
 import RemoveButton from "./UtilComponents/RemoveButton";
-import { useSongData } from "../Layout/ClientLayout/ClientLayout";
 interface SongItemProps {
   songId: number;
   onClick?: (song: SongData) => void;
@@ -22,7 +21,6 @@ const PlaylistSongItem: React.FC<SongItemProps> = ({
   const [song, setSong] = useState<SongData | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [length, setLength] = useState<string>("");
-  const { setSelectedSong } = useSongData();
   useEffect(() => {
     console.log("Playlist ID: ", playListId);
     // Fetch song data
@@ -107,7 +105,6 @@ const PlaylistSongItem: React.FC<SongItemProps> = ({
           <div
             className="flex flex-row items-center space-x-4 flex-grow justify-between mr-4"
             onClick={() => {
-              setSelectedSong(song);
               if (onClick) {
                 onClick(song);
               }
