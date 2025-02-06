@@ -1,4 +1,7 @@
 // Song component
+import { useDispatch } from "react-redux";
+import { setSelectedSong } from "../features/selectedSongSlice";
+
 import { PlayCircleIcon } from "@heroicons/react/16/solid";
 interface SongProps {
   data: SongData;
@@ -7,13 +10,24 @@ interface SongProps {
 }
 //Used in song discovery/ search results. Will automatically increase listen count every time a song is played
 const Song: React.FC<SongProps> = ({ data }) => {
+  const dispatch = useDispatch();
+
   return (
-    <a className="group relative">
+    <a className="group">
       <div
-        className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7"
+        className="relative w-full overflow-hidden rounded-lg bg-gray-200"
         //Call api to increase listen count then onClick
-        onClick={async () => {
-          
+        onClick={() => {
+          console.log("Song clicked: ", data.title);
+          const song: SongData = {
+            _id: data._id,
+            title: data.title,
+            poster: data.poster,
+            artist: data.artist,
+            source: data.source,
+            tags: data.tags,
+          };
+          dispatch(setSelectedSong(song));
         }}
       >
         <img

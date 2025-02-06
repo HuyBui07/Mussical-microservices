@@ -13,10 +13,10 @@ const GlobalMusicPlayer: React.FC<MusicPlayerProps> = ({
   onSongEnd,
 }) => {
   return (
-    <div className="m-2 bg-zinc-800" style={{ borderRadius: "10px" }}>
+    <div className="p-2 bg-zinc-800" style={{ borderRadius: "10px" }}>
       <div className="h-full w-full">
         <div className="flex flex-row bg-transparent border-transparent border-b rounded-t-xl space-y-6 sm:space-y-8 lg:space-y-6 xl:space-y-12">
-          <div className="ml-2 flex items-center space-x-4 ">
+          <div className="ml-2 flex items-center space-x-4 w-1/4">
             <img
               src={selectedSong ? selectedSong.poster : ""}
               alt=""
