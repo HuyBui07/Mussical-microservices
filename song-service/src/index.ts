@@ -24,6 +24,17 @@ app.use(
   })
 );
 
+// // Middleware to log every request
+// app.use((req, res, next) => {
+//   console.log(`${req.method} ${req.url}`);
+//   console.log("Headers:", req.headers);
+//   if (req.method !== "GET") {
+//     console.log("Body:", req.body);
+//   }
+//   next();
+// });
+
+
 app.use("/api", songRouter);
 
 // raft

@@ -53,6 +53,7 @@ const GlobalMusicPlayer: React.FC<MusicPlayerProps> = ({
               autoPlay={true}
               onEnded={() => {
                 if (selectedSong) {
+                  
                   onSongEnd && onSongEnd(selectedSong._id);
                 } else console.log("Song ended. No more songs to play.");
               }}

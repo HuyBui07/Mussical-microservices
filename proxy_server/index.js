@@ -39,7 +39,6 @@ app.use("/proxy", (req, res, next) => {
     const proxies = [sideProxy1, sideProxy2];
     
     proxies[counter % proxies.length](req, res, next);
-    console.log(`Request sent to ${counter % proxies.length + 1}`);
     counter++;
   } else proxy(req, res, next);
 });

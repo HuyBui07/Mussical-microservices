@@ -33,10 +33,14 @@ const AddSongModal = ({
     tags: [],
   });
   const [loading, setLoading] = useState<boolean>(false);
-  const [serverAvailableTags, setServerAvailableTags] =
-    useState<ServerTagResponse>({
-      tags: [],
-    });
+  const [serverAvailableTags, setServerAvailableTags] = useState([
+    "Other",
+    "Pop",
+    "Rock",
+    "Jazz",
+    "Blues",
+    "Classical",
+  ]);
   const [loadingTags, setLoadingTags] = useState<boolean>(true);
   const handleSave = async () => {
     setLoading(true);
@@ -57,7 +61,7 @@ const AddSongModal = ({
     }
     console.log("Data before fetch", data);
     try {
-      const response = await fetch("http://localhost:4000/api/songs", {
+      const response = await fetch("http://localhost:4000/proxy/api/create", {
         method: "POST",
         body: data,
         headers: {
@@ -73,22 +77,6 @@ const AddSongModal = ({
     }
     setLoading(false);
   };
-  useEffect(() => {
-    const fetchTags = async () => {
-      setLoadingTags(true);
-      const res = await fetch("http://localhost:4000/api/songs/stats/tags", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data: ServerTagItem[] = await res.json();
-      setServerAvailableTags({ tags: [...data, { _id: "Other", count: 0 }] });
-      setLoadingTags(false);
-    };
-    fetchTags();
-  }, []);
   return (
     <div
       className="fixed inset-0 z-10 overflow-y-auto"
@@ -160,26 +148,19 @@ const AddSongModal = ({
                       })
                     }
                   />
-                  {loadingTags ? (
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
-                    </div>
-                  ) : (
-                    <TagField
-                      tags={serverAvailableTags.tags.map(
-                        (tag: ServerTagItem) => tag._id
-                      )}
-                      label="Tags of the song"
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setFormData({
-                          ...formData,
-                          tags: [e.target.value],
-                        });
-                      }}
-                      value={formData.tags ? formData.tags[0] : ""}
-                    />
-                  )}
+
+                  <TagField
+                    tags={serverAvailableTags}
+                    label="Tags of the song"
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setFormData({
+                        ...formData,
+                        tags: [e.target.value],
+                      });
+                    }}
+                    value={formData.tags ? formData.tags[0] : ""}
+                  />
                 </div>
               </div>
             </div>

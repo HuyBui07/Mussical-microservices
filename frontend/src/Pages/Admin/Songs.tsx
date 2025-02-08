@@ -1,8 +1,6 @@
-import { useRef, useState } from "react";
-import SongTable from "../../Components/Admin/Song/SongTable";
-import { SongTableHandle } from "../../Components/Admin/Song/SongTable";
-import { SongProps } from "../../Type/type";
-import EditSongModal from "../../Components/Admin/Song/EditSongModal";
+import { useEffect, useState } from "react";
+import LoadingCircle from "../../Components/UtilComponents/LoadingCircle";
+
 import AddSongModal from "../../Components/Admin/Song/AddSongModal";
 export interface AdminSongItem {
   _id: number;
@@ -15,30 +13,39 @@ export interface AdminSongItem {
 }
 export default function Songs() {
   const [isModalAddSongOpen, setIsModalAddSongOpen] = useState(false);
-  const [isModalEditSongOpen, setIsModalEditSongOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<SongProps | null>(null);
-  const tableRef = useRef<SongTableHandle>(null);
-  const handleEditSong = (song: SongProps) => {
-    setSelectedSong(song);
-    setIsModalEditSongOpen(true);
+  const [songs, setSongs] = useState<AdminSongItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSongs = async () => {
+    try {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // Simulate loading
+      const response = await fetch("http://localhost:4000/proxy/api/all");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Fetched songs:", data); // Debugging log
+      setSongs(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch songs:", error);
+    }
   };
 
   const closeModal = async () => {
-    setIsModalEditSongOpen(false);
     setIsModalAddSongOpen(false);
-    setSelectedSong(null);
-    if (tableRef.current) {
-      await tableRef.current.refresh();
-    }
+    await fetchSongs();
   };
+
+  useEffect(() => {
+    fetchSongs();
+  }, []);
 
   return (
     <>
       {/* Songs Management */}
-      <div
-        className="m-2  ml-4 bg-zinc-800 h-[80vh]"
-        style={{ borderRadius: "10px" }}
-      >
+      <div className="bg-zinc-800 h-full" style={{ borderRadius: "10px" }}>
         <div className="flex justify-between items-center mb-4 ">
           <p className="font-bold text-xl ml-6 mt-6">Songs</p>
           <button
@@ -48,18 +55,58 @@ export default function Songs() {
             Import
           </button>
         </div>
-        {/* Table displaying songs */}
-        <SongTable handleEditSong={handleEditSong} ref={tableRef} />
-      </div>
 
-      {/* Modal for Editing*/}
-      {isModalEditSongOpen && (
-        <EditSongModal
-          song={selectedSong as SongProps}
-          closeModal={closeModal}
-          afterSave={closeModal}
-        />
-      )}
+        {/* Songs Table */}
+        <div className="mx-6">
+          <table className="min-w-full bg-gray-800">
+            <thead>
+              <tr>
+                <th className="text-left py-3 px-4 uppercase font-semibold text-sm text-gray-300">
+                  Title
+                </th>
+                <th className="text-left py-3 px-4 uppercase font-semibold text-sm text-gray-300">
+                  Artist
+                </th>
+                <th className="text-left py-3 px-4 uppercase font-semibold text-sm text-gray-300">
+                  Listen Count
+                </th>
+                <th className="text-left py-3 px-4 uppercase font-semibold text-sm text-gray-300">
+                  Tags
+                </th>
+                <th className="text-left py-3 px-4 uppercase font-semibold text-sm text-gray-300">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <div className="flex justify-center items-center m-auto mt-10 mb-10">
+                  <LoadingCircle />
+                </div>
+              ) : (
+                songs.map((song) => (
+                  <tr key={song._id}>
+                    <td className="text-left py-3 px-4">{song.title}</td>
+                    <td className="text-left py-3 px-4">{song.artist}</td>
+                    <td className="text-left py-3 px-4">{song.listenCount}</td>
+                    <td className="text-left py-3 px-4">
+                      {song.tags && song.tags.join(", ")}
+                    </td>
+                    <td className="text-left py-3 px-4">
+                      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                        Edit
+                      </button>
+                      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Modal for Adding new Songs*/}
       {isModalAddSongOpen && (

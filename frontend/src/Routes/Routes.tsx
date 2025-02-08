@@ -3,7 +3,6 @@ import ClientLayout from "../Layout/ClientLayout";
 import EmptyLayout from "../Layout/EmptyLayout";
 import Home from "../Pages/Clients/Home";
 import Login from "../Pages/Common/Login";
-import Playlist from "../Pages/Clients/Playlist";
 import Profile from "../Pages/Clients/Profile";
 import Register from "../Pages/Common/Register";
 import Statistic from "../Pages/Admin/Statistics";
@@ -21,7 +20,6 @@ const publicRoutes = [
     component: Statistic,
     layout: AdminLayout,
   },
-  { path: config.routes.playlist, component: Playlist, layout: ClientLayout },
   { path: config.routes.profile, component: Profile, layout: ClientLayout },
   { path: config.routes.song, component: Songs, layout: AdminLayout },
   { path: config.routes.user, component: User, layout: AdminLayout },

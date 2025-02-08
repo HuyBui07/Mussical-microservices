@@ -40,7 +40,7 @@ const updatingFollowerLog = async (logEntry: any, dest: string) => {
       logEntry: logEntryObject,
       prevLogState: {
         term: latestTerm,
-        index: latestLogIndex,
+        index: latestLogIndex - 1,
       },
     }),
   });
