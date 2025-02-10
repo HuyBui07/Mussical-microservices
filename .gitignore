@@ -1,2 +1,4 @@
 node_modules/
 admin_module/.env
+
+.venv/
