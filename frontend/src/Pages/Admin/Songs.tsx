@@ -38,6 +38,27 @@ export default function Songs() {
     await fetchSongs();
   };
 
+  const handleDelete = async (title: string) => {
+    // Implement delete song
+    try {
+      const response = await fetch("http://localhost:4000/proxy/api/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjJmMDRiNTcyZTcxYzJmMGRmMWI2NDEiLCJpYXQiOjE3MTQzNTc0MzgsImV4cCI6MTcxNDYxNjYzOH0.qWbK65-tM1EfOYEosSziClCkjdmP89Tgla3Gps8oFgs",
+        },
+        body: JSON.stringify({ title: title }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      await fetchSongs();
+    } catch (error) {
+      console.error("Failed to delete song:", error);
+    }
+  };
+
   useEffect(() => {
     fetchSongs();
   }, []);
@@ -93,10 +114,10 @@ export default function Songs() {
                       {song.tags && song.tags.join(", ")}
                     </td>
                     <td className="text-left py-3 px-4">
-                      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                        Edit
-                      </button>
-                      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleDelete(song.title)}
+                      >
                         Remove
                       </button>
                     </td>

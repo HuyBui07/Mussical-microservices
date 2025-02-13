@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import cloudinaryClient, { cloudinaryUploader } from "./cloudinary";
+import mongoose from "mongoose";
 
 //model
 import Song from "./models/songModel";
@@ -16,7 +17,6 @@ import { processLogEntry } from "./raft/processLogEntry";
 
 // URLs
 import { serviceURLs } from "./raft/constants";
-import { log } from "console";
 
 // Function to update the follower's log
 const updatingFollowerLog = async (logEntry: any, dest: string) => {
@@ -40,7 +40,7 @@ const updatingFollowerLog = async (logEntry: any, dest: string) => {
       logEntry: logEntryObject,
       prevLogState: {
         term: latestTerm,
-        index: latestLogIndex - 1,
+        index: latestLogIndex,
       },
     }),
   });
@@ -269,6 +269,61 @@ export const createSong = async (req: Request, res: Response) => {
   }
 };
 
+//delete a song
+export const deleteSong = async (req: Request, res: Response) => {
+  const { title } = req.body;
+
+  try {
+    const song = await Song.findOne({ title: title });
+    console.log("Found song:", song);
+
+    if (!song) {
+      res.status(404).json({ message: "Song not found" });
+      return;
+    }
+
+    state.latestLogIndex += 1;
+
+    const logEntry = new LogEntry({
+      method: req.method,
+      url: req.originalUrl,
+      headers: req.headers,
+      body: song,
+      status: "appended",
+      index: state.latestLogIndex,
+      term: state.term,
+    });
+
+    const savedLogEntry = await logEntry.save();
+
+    res.status(200).json({
+      message: "Song deletion request logged",
+      logEntryId: savedLogEntry._id,
+    });
+
+    forwardLogEntry(logEntry);
+    // //Call the cloudinary api to delete the poster and source
+    // const posterUrl = song?.poster;
+    // const sourceUrl = song?.source;
+    // if (posterUrl && sourceUrl) {
+    //   const publicIdPoster = posterUrl.split("/").pop()?.split(".")[0];
+    //   const publicIdSource = sourceUrl.split("/").pop()?.split(".")[0];
+    //   if (publicIdPoster && publicIdSource) {
+    //     await Promise.all([
+    //       cloudinaryClient.uploader.destroy(publicIdPoster),
+    //       cloudinaryClient.uploader.destroy(publicIdSource),
+    //     ]);
+    //     console.log("Deleted poster and source from cloudinary");
+    //   }
+    // }
+    // console.log("Deleted song", song);
+    // res.status(200).json(song);
+  } catch (err: any) {
+    console.log("Delete song error", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
 //get all songs for the main screen ()
 export const getAllSongs = async (req: Request, res: Response) => {
   const title = (req.query.title as string) || "";
@@ -326,54 +381,7 @@ export const getRecentSongs = async (req: Request, res: Response) => {
 //For you: get user most listened tags. Then get songs with those tags
 // Put those songs on top, if not enough songs, fill in with other songs
 //If no history available, return popular songs
-export const getForYouSongs = async (req: AuthRequest, res: Response) => {
-  const user_id = req.user_id;
-  const { page, limit } = (req as PaginatedRequest).pagination;
-  try {
-    const userHistory = await HistoryRecord.find({ userId: user_id }).exec();
-    if (userHistory.length === 0) {
-      //No history available, return popular songs
-      return getPopularSongs(req, res);
-    }
-
-    //Get user most listened tags
-    const tagScore = new Map<string, number>();
-    for (const record of userHistory) {
-      const song = await Song.findById(record.songId);
-      if (!song) continue;
-      for (const tag of song.tags) {
-        const currentScore = tagScore.get(tag) ?? 0;
-        tagScore.set(tag, currentScore + 1);
-      }
-    }
-    //Sort tags by score
-    const sortedTags = Array.from(tagScore).sort((a, b) => b[1] - a[1]);
-    //Get songs with those tags
-    const totalCount = await Song.countDocuments({}).exec();
-    let songs: any[] = [];
-    for (const tag of sortedTags) {
-      const tagSongs = await Song.find({ tags: tag[0] })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .exec();
-      songs = songs.concat(tagSongs);
-      if (songs.length >= limit) break;
-    }
-    //If not enough songs, fill in with other songs
-    if (songs.length < limit) {
-      const otherSongs = await Song.find({})
-        .limit(limit - songs.length)
-        .skip((page - 1) * limit)
-        .exec();
-      songs = songs.concat(otherSongs);
-    }
-
-    res.setHeader("X-Total-Count", totalCount.toString());
-    res.status(200).json(songs);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
-  }
-};
+export const getForYouSongs = async (req: AuthRequest, res: Response) => {};
 
 //popular songs: get top songs , using limit and and page
 export const getPopularSongs = async (req: Request, res: Response) => {
@@ -430,38 +438,6 @@ export const increaseListenCount = async (req: AuthRequest, res: Response) => {
     console.log("History record created: ", newRecord);
     res.status(200).json({ message: "Listen count increased" });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-//delete a song
-export const deleteSong = async (req: Request, res: Response) => {
-  const { song_id } = req.params;
-
-  try {
-    const song = await Song.findByIdAndDelete(song_id);
-    if (!song) {
-      res.status(404).json({ message: "Song not found" });
-      return;
-    }
-    //Call the cloudinary api to delete the poster and source
-    const posterUrl = song?.poster;
-    const sourceUrl = song?.source;
-    if (posterUrl && sourceUrl) {
-      const publicIdPoster = posterUrl.split("/").pop()?.split(".")[0];
-      const publicIdSource = sourceUrl.split("/").pop()?.split(".")[0];
-      if (publicIdPoster && publicIdSource) {
-        await Promise.all([
-          cloudinaryClient.uploader.destroy(publicIdPoster),
-          cloudinaryClient.uploader.destroy(publicIdSource),
-        ]);
-        console.log("Deleted poster and source from cloudinary");
-      }
-    }
-    console.log("Deleted song", song);
-    res.status(200).json(song);
-  } catch (err: any) {
-    console.log("Delete song error", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -645,5 +621,3 @@ export const getThisMonthStats = async (req: Request, res: Response) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-

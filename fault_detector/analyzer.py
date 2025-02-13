@@ -5,26 +5,26 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.callbacks import EarlyStopping
 import joblib
 
-# Load and preprocess your dataset
+# Load the training data from a CSV file
 data = pd.read_csv('./train_data.csv', header=None, names=['CPU Usage (%)', 'Network Traffic (KB/s)', 'Response Latency (ms)'])
-data = data.values  # Convert DataFrame to numpy array
+data = data.values  # Convert the DataFrame to a NumPy array
 
-# Normalize the data
+# Scale the data
 scaler = StandardScaler()
 data = scaler.fit_transform(data)
 
-# Save the scaler for later use
+# Save the scaler for future use
 joblib.dump(scaler, './scaler.pkl')
 
-# Define the autoencoder architecture
-input_dim = data.shape[1]  # Number of columns in the dataset
-encoding_dim = 10  # Size of the encoded representation
+# Calculate the input dimensionality
+input_dim = data.shape[1]
+print(input_dim)# Number of features in the input data (3 in this case)
+encoding_dim = 1  # Dimensionality of the encoding space (can be set to 1 for maximum compression)
 
+# Define the autoencoder model
 input_layer = tf.keras.layers.Input(shape=(input_dim,))
 encoded = tf.keras.layers.Dense(encoding_dim, activation='relu')(input_layer)
-encoded = tf.keras.layers.Dense(encoding_dim // 2, activation='relu')(encoded)
-decoded = tf.keras.layers.Dense(encoding_dim // 2, activation='relu')(encoded)
-decoded = tf.keras.layers.Dense(input_dim, activation='sigmoid')(decoded)
+decoded = tf.keras.layers.Dense(input_dim, activation='sigmoid')(encoded)
 
 autoencoder = tf.keras.Model(input_layer, decoded)
 autoencoder.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mse')

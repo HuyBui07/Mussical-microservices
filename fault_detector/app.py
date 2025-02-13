@@ -5,8 +5,10 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.losses import MeanSquaredError
 from sklearn.preprocessing import StandardScaler
 import joblib
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Load your pre-trained autoencoder model
 autoencoder = load_model(
@@ -15,7 +17,7 @@ autoencoder = load_model(
 
 scaler = joblib.load('scaler.pkl')
 
-RECONSTRUCTION_ERROR_THRESHOLD = 2.408904540091738
+RECONSTRUCTION_ERROR_THRESHOLD = 2.936235039376418
 
 @app.route("/")
 def hello_world():
@@ -42,6 +44,7 @@ def analyze_data():
         is_normal = reconstruction_error < RECONSTRUCTION_ERROR_THRESHOLD
 
         # Return the reconstruction error and normality status as the analysis result
+        print(f"Reconstruction error: {reconstruction_error}, Is normal: {is_normal}")
         return jsonify({"reconstruction_error": reconstruction_error, "is_normal": bool(is_normal)})
 
     except Exception as e:

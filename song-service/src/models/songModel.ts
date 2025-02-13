@@ -19,33 +19,33 @@ const songSchema: Schema = new Schema({
   tags: { type: [String], required: false, default: [] },
   dateCreated: { type: Date, required: false, default: Date.now },
 });
-// After a song is deleted, remove all related history records and update the user history
-const deleteRelatedHistory = async function (doc: Song) {
-  const HistoryRecord = mongoose.model("HistoryRecord");
-  const User = mongoose.model("User");
+// // After a song is deleted, remove all related history records and update the user history
+// const deleteRelatedHistory = async function (doc: Song) {
+//   const HistoryRecord = mongoose.model("HistoryRecord");
+//   const User = mongoose.model("User");
 
-  console.log("Removing history records for song", doc._id);
+//   console.log("Removing history records for song", doc._id);
 
-  // Find all related history records
-  const historyRecords = await HistoryRecord.find({ songId: doc._id });
+//   // Find all related history records
+//   const historyRecords = await HistoryRecord.find({ songId: doc._id });
 
-  // Delete all related history records
-  await HistoryRecord.deleteMany({ songId: doc._id });
+//   // Delete all related history records
+//   await HistoryRecord.deleteMany({ songId: doc._id });
 
-  // For each history record, remove the reference from the corresponding user's history
-  for (const record of historyRecords) {
-    await User.updateMany(
-      { history: record._id },
-      { $pull: { history: record._id } }
-    );
-  }
-};
+//   // For each history record, remove the reference from the corresponding user's history
+//   for (const record of historyRecords) {
+//     await User.updateMany(
+//       { history: record._id },
+//       { $pull: { history: record._id } }
+//     );
+//   }
+// };
 
-songSchema.post("findOneAndDelete", deleteRelatedHistory);
-songSchema.post(
-  "deleteOne",
-  { document: true, query: false },
-  deleteRelatedHistory
-);
-songSchema.post("deleteMany", deleteRelatedHistory);
-export default mongoose.model<Song>("Song", songSchema);
+// songSchema.post("findOneAndDelete", deleteRelatedHistory);
+// songSchema.post(
+//   "deleteOne",
+//   { document: true, query: false },
+//   deleteRelatedHistory
+// );
+// songSchema.post("deleteMany", deleteRelatedHistory);
+export default mongoose.model("Song", songSchema);

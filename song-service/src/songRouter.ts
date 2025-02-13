@@ -31,12 +31,11 @@ router.get(
   getAllSongs
 );
 router.put("/:song_id", checkIsManager, updateSong);
-router.delete("/:song_id", checkIsManager, deleteSong);
+router.delete("/delete", checkIsManager, deleteSong);
 
 //For normal users
 // test
 // router.use(requireAuth);
-
 router.get("/all", assignPagination, getAllSongs);
 router.get("/recent", assignPagination, getRecentSongs);
 router.get("/for-you", assignPagination, getForYouSongs);

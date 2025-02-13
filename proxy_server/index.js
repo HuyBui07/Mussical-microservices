@@ -1,9 +1,11 @@
 const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const cors = require("cors");
 
 const app = express();
 const PORT = 4000;
 
+app.use(cors());
 // Proxy default leader
 let currentTarget = "http://localhost:5002";
 let sideService1 = "http://localhost:5003";
@@ -37,10 +39,20 @@ let counter = 0;
 app.use("/proxy", (req, res, next) => {
   if (req.method === "GET") {
     const proxies = [sideProxy1, sideProxy2];
-    
-    proxies[counter % proxies.length](req, res, next);
+
+    proxies[counter % proxies.length](req, res, (err) => {
+      if (err) {
+        console.error(`Proxy error: ${err.message}`);
+        counter++;
+        proxies[counter % proxies.length](req, res, next);
+      } else {
+        next();
+      }
+    });
     counter++;
-  } else proxy(req, res, next);
+  } else {
+    proxy(req, res, next);
+  }
 });
 
 app.use(express.json());
